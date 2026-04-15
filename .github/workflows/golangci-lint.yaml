@@ -17,7 +17,7 @@ jobs:
   golangci-lint:
     runs-on: ubuntu-latest
     permissions:
-      content: read
+      contents: read
 
     steps:
       - name: Checkout main

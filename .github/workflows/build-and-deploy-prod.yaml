@@ -51,7 +51,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   Deploy-to-Prod:
-    needs: Build-and-Push
+    needs: Build-and-Push-to-GHCR
     environment: prod
     runs-on: ubuntu-latest
 
