@@ -1,29 +1,33 @@
-# Make sure to enable 'Require status checks to pass before merging' on the branch protection,
-# and to select the 'Build-and-Push' action.
-
-name: Build Image
+name: Build and Push to GHCR
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Commit SHA to build (leave empty for head of branch)'
+        required: false
+        default: ''
 
 permissions: {}
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: vzauartcc/dbot
+  DEPLOYMENT_NAME: dbot
 
 jobs:
   Build-and-Push-to-GHCR:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      contents: read
 
     steps:
-      - name: Checkout master
+      - name: Checkout main
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           persist-credentials: false
+          ref: ${{ github.event.inputs.commit_sha || github.ref }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
@@ -40,6 +44,7 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.commit_sha || github.ref }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

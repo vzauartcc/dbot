@@ -1,7 +1,7 @@
 # Make sure to enable 'Require status checks to pass before merging' on the branch protection,
 # and to select the 'golangci-lint' action.
 
-name: golangci-lint
+name: Lint
 
 on:
   pull_request:

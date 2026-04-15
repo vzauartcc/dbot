@@ -1,7 +1,7 @@
 # Make sure to enable 'Require status checks to pass before merging' on the branch protection,
-# and to select the 'go-test' action.
+# and to select the 'Build-and-Push' action.
 
-name: Go Test
+name: CI Check
 
 on:
   pull_request:
@@ -14,11 +14,11 @@ on:
 permissions: {}
 
 jobs:
-  go-test:
+  Verify-App-Builds-and-Tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout master
+      - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           persist-credentials: false
@@ -30,6 +30,12 @@ jobs:
 
       - name: Install dependencies
         run: go mod download
+
+      - name: Verify Dependencies
+        run: go mod verify
+
+      - name: Build App
+        run: go build -v ./...
 
       - name: Run Tests
         run: go test -v -race -cover ./...
