@@ -1,0 +1,71 @@
+name: Build and Deploy Prod
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+
+permissions: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: vzauartcc/dbot
+  K8_NAMESPACE: zau-web-stack
+  DEPLOYMENT_NAME: dbot
+
+jobs:
+  Build-and-Push-to-GHCR:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+
+      - name: Log in to container registry
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  Deploy-to-Prod:
+    needs: Build-and-Push
+    environment: prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Initialize doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log into K8s cluster
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 zau-k8s
+
+      - name: Deploy image to cluster
+        run: kubectl set image deployment/${{ env.DEPLOYMENT_NAME }} ${{ env.DEPLOYMENT_NAME }}=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} --record -n ${{ env.K8_NAMESPACE }}
+
+      - name: Verify deployment
+        run: kubectl rollout status deployment/${{ env.DEPLOYMENT_NAME }} -n ${{ env.K8_NAMESPACE }}
