@@ -19,9 +19,9 @@ type UserData struct {
 }
 
 func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
-	mainGuild := os.Getenv("DISCORD_GUILD_ID")
+	mainGuild := os.Getenv("DISCORD_SERVER_ID")
 	if strings.TrimSpace(mainGuild) == "" {
-		log.Println("Redis queue skipped due to no DISCORD_GUILD_ID")
+		log.Println("Redis queue skipped due to no DISCORD_SERVER_ID")
 		return
 	}
 

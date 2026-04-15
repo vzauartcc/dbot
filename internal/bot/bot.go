@@ -2,12 +2,20 @@ package bot
 
 import (
 	"log"
+	"os"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/vzauartcc/dbot/internal/commands"
 )
 
-func RegisterCommands(s *discordgo.Session, guildID string) {
+func RegisterCommands(s *discordgo.Session) {
+	guildID := os.Getenv("DISCORD_SERVER_ID")
+	if strings.TrimSpace(guildID) == "" {
+		log.Println("Skipping command registration due to missing DISCORD_SERVER_ID")
+		return
+	}
+
 	log.Println("Registering commands...")
 
 	for _, cmd := range commands.AllCommands {

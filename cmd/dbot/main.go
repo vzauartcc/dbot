@@ -20,7 +20,7 @@ func main() {
 
 	zauapi.Init()
 
-	s, err := discordgo.New("Bot " + os.Getenv("DISCORD_TOKEN"))
+	s, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN"))
 	if err != nil {
 		log.Println("Invalid bot parameters: ", err)
 		return
@@ -43,7 +43,7 @@ func main() {
 	}
 	defer s.Close()
 
-	bot.RegisterCommands(s, os.Getenv("DISCORD_SERVER_ID"))
+	bot.RegisterCommands(s)
 
 	queue.StartRedisQueue(ctx, s)
 
