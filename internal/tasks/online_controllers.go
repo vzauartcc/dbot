@@ -8,6 +8,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 func (m *Manager) UpdateOnlineControllers() {
@@ -45,7 +46,7 @@ func (m *Manager) UpdateOnlineControllers() {
 	}
 
 	for _, guild := range m.Session.State.Guilds {
-		cfg, ok := zauapi.GetConfig(guild.ID)
+		cfg, ok := models.GetConfig(guild.ID)
 		if !ok {
 			continue
 		}
@@ -56,7 +57,7 @@ func (m *Manager) UpdateOnlineControllers() {
 			if err != nil {
 				log.Printf("Error sending Online Controllers message: %v\n", err)
 			} else {
-				cfg.SetOnlineMessage(sentMsg.ID, msg.GuildID)
+				cfg.SetOnlineMessage(sentMsg.ID, msg.GuildID, zauapi.GetClient())
 			}
 
 			return

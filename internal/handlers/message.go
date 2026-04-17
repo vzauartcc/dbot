@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 var reminderMessages map[string]string
 
 func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
-	cfg, ok := zauapi.GetConfig(message.GuildID)
+	cfg, ok := models.GetConfig(message.GuildID)
 	if !ok {
 		return
 	}

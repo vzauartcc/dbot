@@ -9,7 +9,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/redis/go-redis/v9"
-	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
@@ -86,7 +86,7 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 				continue
 			}
 
-			cfg, ok := zauapi.GetConfig(mainGuild)
+			cfg, ok := models.GetConfig(mainGuild)
 			if !ok {
 				continue
 			}

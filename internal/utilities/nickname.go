@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
-func SetNickname(s *discordgo.Session, member *discordgo.Member, user zauapi.User) error {
+func SetNickname(s *discordgo.Session, member *discordgo.Member, user models.User) error {
 	var err error
 
 	newNick := calculateNewNickname(user)
@@ -23,7 +23,7 @@ func SetNickname(s *discordgo.Session, member *discordgo.Member, user zauapi.Use
 	return err
 }
 
-func calculateNewNickname(user zauapi.User) string {
+func calculateNewNickname(user models.User) string {
 	newNick := user.FirstName + " " + user.LastName
 
 	roles := make([]string, 0)

@@ -3,22 +3,22 @@ package commands
 import (
 	"testing"
 
-	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 func TestGenerateStaffEmbed(t *testing.T) {
-	staff := zauapi.Staff{
-		ATM: zauapi.StaffPosition{
-			Users: []zauapi.User{
+	staff := models.Staff{
+		ATM: models.StaffPosition{
+			Users: []models.User{
 				{FirstName: "John", LastName: "Doe"},
 				{FirstName: "Jane", LastName: "Smith"},
 			},
 		},
-		DATM: zauapi.StaffPosition{Users: []zauapi.User{{FirstName: "Bob", LastName: "Brown"}}},
-		TA:   zauapi.StaffPosition{Users: []zauapi.User{{FirstName: "Alice", LastName: "Green"}}},
-		EC:   zauapi.StaffPosition{Users: []zauapi.User{{FirstName: "Charlie", LastName: "White"}}},
-		FE:   zauapi.StaffPosition{Users: []zauapi.User{{FirstName: "David", LastName: "Black"}}},
-		WM:   zauapi.StaffPosition{Users: []zauapi.User{{FirstName: "Eve", LastName: "Gray"}}},
+		DATM: models.StaffPosition{Users: []models.User{{FirstName: "Bob", LastName: "Brown"}}},
+		TA:   models.StaffPosition{Users: []models.User{{FirstName: "Alice", LastName: "Green"}}},
+		EC:   models.StaffPosition{Users: []models.User{{FirstName: "Charlie", LastName: "White"}}},
+		FE:   models.StaffPosition{Users: []models.User{{FirstName: "David", LastName: "Black"}}},
+		WM:   models.StaffPosition{Users: []models.User{{FirstName: "Eve", LastName: "Gray"}}},
 	}
 
 	embed := generateStaffEmbed(staff)

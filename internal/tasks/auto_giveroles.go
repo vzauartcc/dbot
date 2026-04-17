@@ -4,6 +4,7 @@ import (
 	"log"
 
 	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
@@ -18,7 +19,7 @@ func (m *Manager) AutoGiveRoles() {
 
 	for _, user := range users {
 		for _, guild := range m.Session.State.Guilds {
-			cfg, ok := zauapi.GetConfig(guild.ID)
+			cfg, ok := models.GetConfig(guild.ID)
 			if !ok {
 				continue
 			}

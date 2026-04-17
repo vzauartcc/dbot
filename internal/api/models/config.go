@@ -1,4 +1,4 @@
-package zauapi
+package models
 
 import (
 	"log"
@@ -24,6 +24,12 @@ type UpdateableMessage struct {
 type ManagedRole struct {
 	LookupKey string `json:"key"`
 	RoleID    string `json:"roleId"`
+}
+
+// ConfigUpdater is an interface to allow API interaction,
+// its functions should match the API.
+type ConfigUpdater interface {
+	UpdateConfig(guildID string, config *Config) (*Config, error)
 }
 
 var configs map[string]*Config
@@ -72,10 +78,10 @@ func (c *Config) GetIronMicMessage() string {
 	return c.IronMicConfig.MessageID
 }
 
-func (c *Config) SetIronMicMessage(messageID, guildID string) {
+func (c *Config) SetIronMicMessage(messageID, guildID string, api ConfigUpdater) {
 	c.IronMicConfig.MessageID = messageID
 
-	c.updateConfig(guildID)
+	c.updateConfig(guildID, api)
 }
 
 func (c *Config) GetManagedRoles() []ManagedRole {
@@ -90,14 +96,14 @@ func (c *Config) GetOnlineMessage() string {
 	return c.OnlineControllers.MessageID
 }
 
-func (c *Config) SetOnlineMessage(messageID, guildID string) {
+func (c *Config) SetOnlineMessage(messageID, guildID string, api ConfigUpdater) {
 	c.OnlineControllers.MessageID = messageID
 
-	c.updateConfig(guildID)
+	c.updateConfig(guildID, api)
 }
 
-func (c *Config) updateConfig(guildID string) {
-	_, err := GetClient().UpdateConfig(guildID, *c)
+func (c *Config) updateConfig(guildID string, service ConfigUpdater) {
+	_, err := service.UpdateConfig(guildID, c)
 	if err != nil {
 		log.Printf("Error updating config: %v\n", err)
 		return

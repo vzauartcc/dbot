@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/cristalhq/jwt/v5"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 func initClient(t *testing.T, srvURL string) {
@@ -24,7 +25,7 @@ func TestGetUsersSuccess(t *testing.T) {
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		capturedReq = req
-		users := []User{{CID: 1, FirstName: "John", LastName: "Doe", DiscordID: "123"}}
+		users := []models.User{{CID: 1, FirstName: "John", LastName: "Doe", DiscordID: "123"}}
 		b, _ := json.Marshal(users)
 
 		writer.Header().Set("Content-Type", "application/json")
@@ -96,7 +97,7 @@ func TestGetUserByIDSuccess(t *testing.T) {
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		capturedReq = req
-		user := User{CID: 2, FirstName: "Alice", LastName: "Smith", DiscordID: "456"}
+		user := models.User{CID: 2, FirstName: "Alice", LastName: "Smith", DiscordID: "456"}
 		b, _ := json.Marshal(user)
 
 		writer.Header().Set("Content-Type", "application/json")
@@ -144,7 +145,10 @@ func TestGetIronMicSuccess(t *testing.T) {
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		capturedReq = req
-		resp := IronMicResponse{Results: IronMicResult{}, Period: ActivityPeriod{}}
+		resp := models.IronMicResponse{
+			Results: models.IronMicResult{},
+			Period:  models.ActivityPeriod{},
+		}
 		b, _ := json.Marshal(resp)
 
 		writer.Header().Set("Content-Type", "application/json")
@@ -171,7 +175,7 @@ func TestGetOnlineATCSuccess(t *testing.T) {
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		capturedReq = req
-		resp := OnlineData{Pilots: nil, Controllers: []OnlineController{{CID: 1}}}
+		resp := models.OnlineData{Pilots: nil, Controllers: []models.OnlineController{{CID: 1}}}
 		b, _ := json.Marshal(resp)
 
 		writer.Header().Set("Content-Type", "application/json")
@@ -198,7 +202,7 @@ func TestGetStaffSuccess(t *testing.T) {
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		capturedReq = req
-		resp := Staff{ATM: StaffPosition{Title: "admin", Code: "A"}}
+		resp := models.Staff{ATM: models.StaffPosition{Title: "admin", Code: "A"}}
 		b, _ := json.Marshal(resp)
 
 		writer.Header().Set("Content-Type", "application/json")

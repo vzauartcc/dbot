@@ -4,6 +4,7 @@ import (
 	"log"
 
 	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 func (m *Manager) FetchBotConfigs() {
@@ -14,6 +15,6 @@ func (m *Manager) FetchBotConfigs() {
 	}
 
 	for _, cfg := range cfgs {
-		zauapi.CacheConfig(cfg)
+		models.CacheConfig(cfg)
 	}
 }

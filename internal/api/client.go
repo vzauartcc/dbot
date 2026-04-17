@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/cristalhq/jwt/v5"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 var (
@@ -117,35 +118,35 @@ func generateJWT() string {
 	return token.String()
 }
 
-func (c *Client) GetUsers() ([]User, error) {
-	return generateRequest[[]User]("GET", "/discord/bot/users", nil)
+func (c *Client) GetUsers() ([]models.User, error) {
+	return generateRequest[[]models.User]("GET", "/discord/bot/users", nil)
 }
 
-func (c *Client) GetUserByID(id string) (User, error) {
-	return generateRequest[User]("GET", "/discord/bot/user/"+id, nil)
+func (c *Client) GetUserByID(id string) (models.User, error) {
+	return generateRequest[models.User]("GET", "/discord/bot/user/"+id, nil)
 }
 
-func (c *Client) GetIronMic() (IronMicResponse, error) {
-	return generateRequest[IronMicResponse]("GET", "/discord/bot/ironmic", nil)
+func (c *Client) GetIronMic() (models.IronMicResponse, error) {
+	return generateRequest[models.IronMicResponse]("GET", "/discord/bot/ironmic", nil)
 }
 
-func (c *Client) GetOnlineATC() (OnlineData, error) {
-	return generateRequest[OnlineData]("GET", "/online", nil)
+func (c *Client) GetOnlineATC() (models.OnlineData, error) {
+	return generateRequest[models.OnlineData]("GET", "/online", nil)
 }
 
-func (c *Client) GetStaff() (Staff, error) {
-	return generateRequest[Staff]("GET", "/controller/staff", nil)
+func (c *Client) GetStaff() (models.Staff, error) {
+	return generateRequest[models.Staff]("GET", "/controller/staff", nil)
 }
 
-func (c *Client) GetConfig(guildID string) (Config, error) {
-	return generateRequest[Config]("GET", "/discord/bot/config/"+guildID, nil)
+func (c *Client) GetConfig(guildID string) (models.Config, error) {
+	return generateRequest[models.Config]("GET", "/discord/bot/config/"+guildID, nil)
 }
 
-func (c *Client) GetConfigs() ([]Config, error) {
-	return generateRequest[[]Config]("GET", "/discord/bot/configs", nil)
+func (c *Client) GetConfigs() ([]models.Config, error) {
+	return generateRequest[[]models.Config]("GET", "/discord/bot/configs", nil)
 }
 
-func (c *Client) UpdateConfig(guildID string, config Config) (Config, error) {
+func (c *Client) UpdateConfig(guildID string, config *models.Config) (*models.Config, error) {
 	buf := new(bytes.Buffer)
 
 	err := json.NewEncoder(buf).Encode(config)
@@ -153,5 +154,5 @@ func (c *Client) UpdateConfig(guildID string, config Config) (Config, error) {
 		return config, err
 	}
 
-	return generateRequest[Config]("PATCH", "/discord/bot/config/"+guildID, buf)
+	return generateRequest[*models.Config]("PATCH", "/discord/bot/config/"+guildID, buf)
 }

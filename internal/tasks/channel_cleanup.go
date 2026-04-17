@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 func (m *Manager) CleanupChannels() {
 	log.Println("Starting channel cleanup task")
 
-	for _, cfg := range zauapi.GetConfigs() {
+	for _, cfg := range models.GetConfigs() {
 		for channelID, keepMsgID := range cfg.GetCleanupChannels() {
 			messages := fetchAllMessages(m.Session, channelID)
 			count, errored, total := 0, 0, 0

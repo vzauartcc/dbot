@@ -8,6 +8,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 func (m *Manager) UpdateIronMic() {
@@ -22,7 +23,7 @@ func (m *Manager) UpdateIronMic() {
 	embed := buildIronMicMessage(data)
 
 	for _, guild := range m.Session.State.Guilds {
-		cfg, ok := zauapi.GetConfig(guild.ID)
+		cfg, ok := models.GetConfig(guild.ID)
 		if !ok {
 			continue
 		}
@@ -33,7 +34,7 @@ func (m *Manager) UpdateIronMic() {
 			if err != nil {
 				log.Printf("Error sending IronMic message: %v\n", err)
 			} else {
-				cfg.SetIronMicMessage(sentMsg.ID, msg.GuildID)
+				cfg.SetIronMicMessage(sentMsg.ID, msg.GuildID, zauapi.GetClient())
 			}
 
 			return
@@ -52,7 +53,7 @@ func (m *Manager) UpdateIronMic() {
 	}
 }
 
-func buildIronMicMessage(data zauapi.IronMicResponse) *discordgo.MessageEmbed {
+func buildIronMicMessage(data models.IronMicResponse) *discordgo.MessageEmbed {
 	var descriptionBuilder strings.Builder
 	descriptionBuilder.WriteString("**C1+:**\n")
 

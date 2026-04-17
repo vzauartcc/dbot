@@ -7,6 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
@@ -50,7 +51,7 @@ func StaffHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 }
 
-func generateStaffEmbed(staff zauapi.Staff) *discordgo.MessageEmbed {
+func generateStaffEmbed(staff models.Staff) *discordgo.MessageEmbed {
 	atms := make([]string, 0, len(staff.ATM.Users))
 	datms := make([]string, 0, len(staff.DATM.Users))
 	tas := make([]string, 0, len(staff.TA.Users))

@@ -5,11 +5,12 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func HandleGuildMemberAdd(s *discordgo.Session, event *discordgo.GuildMemberAdd) {
-	cfg, ok := zauapi.GetConfig(event.GuildID)
+	cfg, ok := models.GetConfig(event.GuildID)
 	if !ok {
 		return
 	}

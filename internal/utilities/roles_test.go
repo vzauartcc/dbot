@@ -4,11 +4,11 @@ import (
 	"slices"
 	"testing"
 
-	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
-func newConfig(roles ...zauapi.ManagedRole) *zauapi.Config {
-	return &zauapi.Config{ManagedRoles: roles}
+func newConfig(roles ...models.ManagedRole) *models.Config {
+	return &models.Config{ManagedRoles: roles}
 }
 
 func assertContains(t *testing.T, got []string, expected ...string) {
@@ -43,10 +43,10 @@ func assertSliceEqual(t *testing.T, got []string, expected ...string) {
 
 func TestRolesToAdd_MemberNonVisitor(t *testing.T) {
 	cfg := newConfig(
-		zauapi.ManagedRole{LookupKey: "HOME", RoleID: "idHome"},
-		zauapi.ManagedRole{LookupKey: "SUS", RoleID: "idSus"})
+		models.ManagedRole{LookupKey: "HOME", RoleID: "idHome"},
+		models.ManagedRole{LookupKey: "SUS", RoleID: "idSus"})
 
-	user := zauapi.User{
+	user := models.User{
 		Rating:       0,
 		IsMember:     true,
 		IsVisitor:    false,
@@ -59,12 +59,12 @@ func TestRolesToAdd_MemberNonVisitor(t *testing.T) {
 
 func TestRolesToAdd_MemberVis_Cert_Zhq_Rating4(t *testing.T) {
 	cfg := newConfig(
-		zauapi.ManagedRole{LookupKey: "VIS", RoleID: "idVis"},
-		zauapi.ManagedRole{LookupKey: "S3", RoleID: "idS3"},
-		zauapi.ManagedRole{LookupKey: "CERT_X", RoleID: "idCertX"},
-		zauapi.ManagedRole{LookupKey: "zhq", RoleID: "idZhq"})
+		models.ManagedRole{LookupKey: "VIS", RoleID: "idVis"},
+		models.ManagedRole{LookupKey: "S3", RoleID: "idS3"},
+		models.ManagedRole{LookupKey: "CERT_X", RoleID: "idCertX"},
+		models.ManagedRole{LookupKey: "zhq", RoleID: "idZhq"})
 
-	user := zauapi.User{
+	user := models.User{
 		Rating:       4,
 		IsMember:     true,
 		IsVisitor:    true,
@@ -78,10 +78,10 @@ func TestRolesToAdd_MemberVis_Cert_Zhq_Rating4(t *testing.T) {
 
 func TestRolesToAdd_NonMember_Guest_Rating1(t *testing.T) {
 	cfg := newConfig(
-		zauapi.ManagedRole{LookupKey: "GUEST", RoleID: "idGuest"},
-		zauapi.ManagedRole{LookupKey: "OBS", RoleID: "idObs"})
+		models.ManagedRole{LookupKey: "GUEST", RoleID: "idGuest"},
+		models.ManagedRole{LookupKey: "OBS", RoleID: "idObs"})
 
-	user := zauapi.User{
+	user := models.User{
 		Rating:       1,
 		IsMember:     false,
 		HomeFacility: "XYZ",
@@ -93,8 +93,8 @@ func TestRolesToAdd_NonMember_Guest_Rating1(t *testing.T) {
 
 func TestCalculateRoles_NoChanges(t *testing.T) {
 	cfg := newConfig(
-		zauapi.ManagedRole{LookupKey: "A", RoleID: "idA"},
-		zauapi.ManagedRole{LookupKey: "B", RoleID: "idB"})
+		models.ManagedRole{LookupKey: "A", RoleID: "idA"},
+		models.ManagedRole{LookupKey: "B", RoleID: "idB"})
 
 	existing := []string{"idA", "idB"}
 	expected := []string{"idA", "idB"}
@@ -107,9 +107,9 @@ func TestCalculateRoles_NoChanges(t *testing.T) {
 
 func TestCalculateRoles_AddOnly(t *testing.T) {
 	cfg := newConfig(
-		zauapi.ManagedRole{LookupKey: "A", RoleID: "idA"},
-		zauapi.ManagedRole{LookupKey: "B", RoleID: "idB"},
-		zauapi.ManagedRole{LookupKey: "C", RoleID: "idC"})
+		models.ManagedRole{LookupKey: "A", RoleID: "idA"},
+		models.ManagedRole{LookupKey: "B", RoleID: "idB"},
+		models.ManagedRole{LookupKey: "C", RoleID: "idC"})
 
 	existing := []string{"idA"}
 	expected := []string{"idA", "idB", "idC"}
@@ -124,8 +124,8 @@ func TestCalculateRoles_AddOnly(t *testing.T) {
 
 func TestCalculateRoles_RemoveOnly(t *testing.T) {
 	cfg := newConfig(
-		zauapi.ManagedRole{LookupKey: "A", RoleID: "idA"},
-		zauapi.ManagedRole{LookupKey: "B", RoleID: "idB"})
+		models.ManagedRole{LookupKey: "A", RoleID: "idA"},
+		models.ManagedRole{LookupKey: "B", RoleID: "idB"})
 
 	existing := []string{"idA", "idB", "idD"}
 	expected := []string{"idA"}

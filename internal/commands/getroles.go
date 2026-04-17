@@ -6,6 +6,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
@@ -21,7 +22,7 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	cfg, ok := zauapi.GetConfig(i.GuildID)
+	cfg, ok := models.GetConfig(i.GuildID)
 	if !ok {
 		log.Printf(
 			"%s used the /getroles command in an unsupported guild: %s",

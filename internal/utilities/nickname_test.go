@@ -3,16 +3,16 @@ package helpers
 import (
 	"testing"
 
-	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 func TestCalculateNewNickname(t *testing.T) {
 	cases := []struct {
-		user   zauapi.User
+		user   models.User
 		expect string
 	}{
 		{ // No special roles, rating S1 suffix
-			user: zauapi.User{
+			user: models.User{
 				FirstName: "John",
 				LastName:  "Doe",
 				Rating:    2,
@@ -20,7 +20,7 @@ func TestCalculateNewNickname(t *testing.T) {
 			expect: "John Doe | S1",
 		},
 		{ // ATM and DATM roles, rating SUS not suffix
-			user: zauapi.User{
+			user: models.User{
 				FirstName: "Jane",
 				LastName:  "Doe",
 				Rating:    0,
@@ -29,7 +29,7 @@ func TestCalculateNewNickname(t *testing.T) {
 			expect: "Jane Doe | ATM",
 		},
 		{ // Home facility zhq gives VATUSA, rating S3 suffix
-			user: zauapi.User{
+			user: models.User{
 				FirstName:    "Bob",
 				LastName:     "Doe",
 				Rating:       4,
@@ -38,7 +38,7 @@ func TestCalculateNewNickname(t *testing.T) {
 			expect: "Bob Doe | VATUSA",
 		},
 		{ // I3 role with visitor true gives C1
-			user: zauapi.User{
+			user: models.User{
 				FirstName: "Eve",
 				LastName:  "Doe",
 				Rating:    0,
@@ -48,7 +48,7 @@ func TestCalculateNewNickname(t *testing.T) {
 			expect: "Eve Doe | C1",
 		},
 		{ // I3 role with visitor false gives I3
-			user: zauapi.User{
+			user: models.User{
 				FirstName: "Mallory",
 				LastName:  "Doe",
 				Rating:    0,
@@ -58,7 +58,7 @@ func TestCalculateNewNickname(t *testing.T) {
 			expect: "Mallory Doe | I3",
 		},
 		{ // ATM and zhq roles together
-			user: zauapi.User{
+			user: models.User{
 				FirstName: "Peggy",
 				LastName:  "Doe",
 				Rating:    0,
@@ -67,7 +67,7 @@ func TestCalculateNewNickname(t *testing.T) {
 			expect: "Peggy Doe | ATM",
 		},
 		{ // TA and EC roles
-			user: zauapi.User{
+			user: models.User{
 				FirstName: "Trudy",
 				LastName:  "Doe",
 				Rating:    0,

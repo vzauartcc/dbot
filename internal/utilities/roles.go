@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	zauapi "github.com/vzauartcc/dbot/internal/api"
+	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
 var ratingsToString = []string{
@@ -27,7 +27,7 @@ var ratingsToString = []string{
 	"ADM",
 }
 
-func RolesToAdd(cfg *zauapi.Config, user zauapi.User) []string {
+func RolesToAdd(cfg *models.Config, user models.User) []string {
 	rolesToGive := make([]string, 0)
 
 	webRoles := user.Roles
@@ -70,7 +70,7 @@ func RolesToAdd(cfg *zauapi.Config, user zauapi.User) []string {
 }
 
 func calculateRoles(
-	cfg *zauapi.Config,
+	cfg *models.Config,
 	existingRoles []string,
 	rolesToGive []string,
 ) ([]string, []string) {
@@ -103,7 +103,7 @@ func calculateRoles(
 func ExchangeRoles(
 	s *discordgo.Session,
 	member *discordgo.Member,
-	cfg *zauapi.Config,
+	cfg *models.Config,
 	rolesToGive []string,
 	reason string,
 ) []error {
