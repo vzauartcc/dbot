@@ -17,7 +17,7 @@ func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	if message.Author.ID == s.State.User.ID {
+	if message.Author.ID == s.State.User.ID || message.Author.Bot {
 		return
 	}
 
