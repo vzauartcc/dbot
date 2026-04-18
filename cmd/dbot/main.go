@@ -34,7 +34,10 @@ func main() {
 		stop()
 	})
 
-	s.Identify.Intents = discordgo.IntentGuildMessages | discordgo.IntentsMessageContent
+	s.Identify.Intents = discordgo.IntentGuilds |
+		discordgo.IntentGuildMembers | discordgo.IntentGuildMessages |
+		discordgo.IntentMessageContent | discordgo.IntentGuildMessageReactions |
+		discordgo.IntentDirectMessages | discordgo.IntentDirectMessageReactions
 
 	err = s.Open()
 	if err != nil {
