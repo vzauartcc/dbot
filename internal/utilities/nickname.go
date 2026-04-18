@@ -42,14 +42,14 @@ func calculateNewNickname(user models.User) string {
 		newNick += " | ATM"
 	case slices.Contains(roles, "datm"):
 		newNick += " | DATM"
-	case slices.Contains(roles, "ta"):
-		newNick += " | TA"
-	case slices.Contains(roles, "ec"):
-		newNick += " | EC"
-	case slices.Contains(roles, "fe"):
-		newNick += " | FE"
-	case slices.Contains(roles, "WM"):
-		newNick += " | WM"
+	// case slices.Contains(roles, "ta"):
+	// 	newNick += " | TA"
+	// case slices.Contains(roles, "ec"):
+	// 	newNick += " | EC"
+	// case slices.Contains(roles, "fe"):
+	// 	newNick += " | FE"
+	// case slices.Contains(roles, "WM"):
+	// 	newNick += " | WM"
 	case slices.Contains(roles, "zhq"):
 		newNick += " | VATUSA"
 	case slices.Contains(roles, "ins"):
