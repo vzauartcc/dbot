@@ -34,7 +34,7 @@ func (m *Manager) UpdateIronMic() {
 			if err != nil {
 				log.Printf("Error sending IronMic message: %v\n", err)
 			} else {
-				cfg.SetIronMicMessage(sentMsg.ID, msg.GuildID, zauapi.GetClient())
+				cfg.SetIronMicMessage(sentMsg.ID, zauapi.GetClient())
 			}
 
 			return
