@@ -32,6 +32,11 @@ type ConfigUpdater interface {
 	UpdateConfig(guildID string, config *Config) (*Config, error)
 }
 
+type ConfigUpdate struct {
+	IronMicMessageID           string `json:"ironMic"`
+	OnlineControllersMessageID string `json:"onlineControllers"`
+}
+
 var configs map[string]*Config
 
 func GetConfig(guildID string) (*Config, bool) {
@@ -78,10 +83,10 @@ func (c *Config) GetIronMicMessage() string {
 	return c.IronMicConfig.MessageID
 }
 
-func (c *Config) SetIronMicMessage(messageID, guildID string, api ConfigUpdater) {
+func (c *Config) SetIronMicMessage(messageID string, api ConfigUpdater) {
 	c.IronMicConfig.MessageID = messageID
 
-	c.updateConfig(guildID, api)
+	c.updateConfig(api)
 }
 
 func (c *Config) GetManagedRoles() []ManagedRole {
@@ -96,14 +101,14 @@ func (c *Config) GetOnlineMessage() string {
 	return c.OnlineControllers.MessageID
 }
 
-func (c *Config) SetOnlineMessage(messageID, guildID string, api ConfigUpdater) {
+func (c *Config) SetOnlineMessage(messageID string, api ConfigUpdater) {
 	c.OnlineControllers.MessageID = messageID
 
-	c.updateConfig(guildID, api)
+	c.updateConfig(api)
 }
 
-func (c *Config) updateConfig(guildID string, service ConfigUpdater) {
-	_, err := service.UpdateConfig(guildID, c)
+func (c *Config) updateConfig(service ConfigUpdater) {
+	_, err := service.UpdateConfig(c.GuildID, c)
 	if err != nil {
 		log.Printf("Error updating config: %v\n", err)
 		return

@@ -149,7 +149,10 @@ func (c *Client) GetConfigs() ([]models.Config, error) {
 func (c *Client) UpdateConfig(guildID string, config *models.Config) (*models.Config, error) {
 	buf := new(bytes.Buffer)
 
-	err := json.NewEncoder(buf).Encode(config)
+	err := json.NewEncoder(buf).Encode(&models.ConfigUpdate{
+		IronMicMessageID:           config.IronMicConfig.MessageID,
+		OnlineControllersMessageID: config.OnlineControllers.MessageID,
+	})
 	if err != nil {
 		return config, err
 	}

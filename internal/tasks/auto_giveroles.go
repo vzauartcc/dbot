@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"log"
+	"strings"
 
 	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/api/models"
@@ -44,7 +45,7 @@ func (m *Manager) AutoGiveRoles() {
 			}
 
 			err = helpers.SetNickname(m.Session, member, user)
-			if err != nil {
+			if err != nil && !strings.Contains(err.Error(), "HTTP 403 Forbidden") {
 				log.Printf(
 					"[AutoRoles] Error setting nickname for %s: %v\n",
 					helpers.GetMemberName(member),

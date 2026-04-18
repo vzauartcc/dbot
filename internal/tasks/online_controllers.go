@@ -53,7 +53,7 @@ func (m *Manager) UpdateOnlineControllers() {
 			if err != nil {
 				log.Printf("Error sending Online Controllers message: %v\n", err)
 			} else {
-				cfg.SetOnlineMessage(sentMsg.ID, msg.GuildID, zauapi.GetClient())
+				cfg.SetOnlineMessage(sentMsg.ID, zauapi.GetClient())
 			}
 
 			return
