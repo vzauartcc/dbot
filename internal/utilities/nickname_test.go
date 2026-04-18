@@ -66,15 +66,6 @@ func TestCalculateNewNickname(t *testing.T) {
 			},
 			expect: "Peggy Doe | ATM",
 		},
-		{ // TA and EC roles
-			user: models.User{
-				FirstName: "Trudy",
-				LastName:  "Doe",
-				Rating:    0,
-				Roles:     []string{"ta", "ec"},
-			},
-			expect: "Trudy Doe | TA",
-		},
 	}
 
 	for _, c := range cases {

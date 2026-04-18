@@ -33,7 +33,6 @@ func RolesToAdd(cfg *models.Config, user models.User) []string {
 	webRoles := user.Roles
 
 	webRoles = append(webRoles, user.CertCodes...)
-	log.Printf("%+v\n", user)
 
 	if user.IsMember {
 		if user.IsVisitor {
