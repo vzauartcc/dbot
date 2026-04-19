@@ -13,7 +13,7 @@ import (
 )
 
 func (m *Manager) UpdateIronMic() {
-	log.Println("Running Iron Mic task. . . .")
+	log.Println("Running Iron Mic task...")
 
 	data, err := zauapi.GetClient().GetIronMic()
 	if err != nil {

@@ -38,7 +38,7 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 
 	rdb := redis.NewClient(redisOpts)
 
-	log.Println("Redis connected, listening for Discord link events. . . .")
+	log.Println("Redis connected, listening for Discord link events...")
 
 	for {
 		result, err := rdb.BRPop(ctx, 0, "new_discord_user", "remove_discord_user").Result()
