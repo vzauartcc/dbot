@@ -30,7 +30,7 @@ func main() {
 
 	// Special registration for the Disconnect to call stop().
 	s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Disconnect) {
-		log.Println("Bot disconnected, stopping. . . .")
+		log.Println("Bot disconnected, stopping...")
 		stop()
 	})
 
@@ -38,6 +38,8 @@ func main() {
 		discordgo.IntentGuildMembers | discordgo.IntentGuildMessages |
 		discordgo.IntentMessageContent | discordgo.IntentGuildMessageReactions |
 		discordgo.IntentDirectMessages | discordgo.IntentDirectMessageReactions
+
+	s.LogLevel = discordgo.LogInformational
 
 	err = s.Open()
 	if err != nil {
