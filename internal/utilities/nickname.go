@@ -14,7 +14,13 @@ func SetNickname(s *discordgo.Session, member *discordgo.Member, user models.Use
 
 	newNick := calculateNewNickname(user)
 
-	if newNick != member.Nick {
+	staffRoles := []string{"atm", "datm", "ta", "ec", "fe", "wm"}
+
+	isStaff := slices.ContainsFunc(user.Roles, func(role string) bool {
+		return slices.Contains(staffRoles, role)
+	})
+
+	if newNick != member.Nick && !isStaff {
 		log.Printf("Updating nickname for %s to: \"%s\"\n", GetMemberName(member), newNick)
 
 		err = s.GuildMemberNickname(member.GuildID, member.User.ID, newNick)
@@ -42,14 +48,14 @@ func calculateNewNickname(user models.User) string {
 		newNick += " | ATM"
 	case slices.Contains(roles, "datm"):
 		newNick += " | DATM"
-	// case slices.Contains(roles, "ta"):
-	// 	newNick += " | TA"
-	// case slices.Contains(roles, "ec"):
-	// 	newNick += " | EC"
-	// case slices.Contains(roles, "fe"):
-	// 	newNick += " | FE"
-	// case slices.Contains(roles, "WM"):
-	// 	newNick += " | WM"
+	case slices.Contains(roles, "ta"):
+		newNick += " | TA"
+	case slices.Contains(roles, "ec"):
+		newNick += " | EC"
+	case slices.Contains(roles, "fe"):
+		newNick += " | FE"
+	case slices.Contains(roles, "WM"):
+		newNick += " | WM"
 	case slices.Contains(roles, "zhq"):
 		newNick += " | VATUSA"
 	case slices.Contains(roles, "ins"):

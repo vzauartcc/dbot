@@ -13,8 +13,4 @@ func RegisterHandlers(s *discordgo.Session) {
 	s.AddHandler(func(s *discordgo.Session, message *discordgo.MessageCreate) {
 		handlers.HandleMessage(s, message)
 	})
-
-	s.AddHandler(func(s *discordgo.Session, ready *discordgo.Ready) {
-		handlers.HandleReadyEvent(s, ready)
-	})
 }

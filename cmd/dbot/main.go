@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
@@ -12,6 +13,12 @@ import (
 	"github.com/vzauartcc/dbot/internal/bot"
 	"github.com/vzauartcc/dbot/internal/queue"
 	"github.com/vzauartcc/dbot/internal/tasks"
+)
+
+var (
+	retryCount int
+	maxRetries = 5
+	retryMutex sync.Mutex
 )
 
 func main() {
@@ -28,16 +35,46 @@ func main() {
 
 	bot.RegisterHandlers(s)
 
-	// Special registration for the Disconnect to call stop().
+	// Special registration for the Ready event to handle retry logic.
+	s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Ready) {
+		retryMutex.Lock()
+		defer retryMutex.Unlock()
+
+		retryCount = 0
+
+		log.Println("==========>  Bot is ready!")
+	})
+
+	// Special registration for the Resumed event to handle retry logic.
+	s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Resumed) {
+		retryMutex.Lock()
+		defer retryMutex.Unlock()
+
+		retryCount = 0
+
+		log.Println("==========>  Bot reconnected!")
+	})
+
+	// Special registration for the Disconnect event to handle retry logic..
 	s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Disconnect) {
-		log.Println("Bot disconnected, stopping. . . .")
-		stop()
+		log.Println("==========>  Discord connection lost, waiting for reconnect...")
+
+		retryMutex.Lock()
+		defer retryMutex.Unlock()
+
+		retryCount++
+		if retryCount > maxRetries {
+			log.Printf("Max retries reached, exiting...")
+			stop()
+		}
 	})
 
 	s.Identify.Intents = discordgo.IntentGuilds |
 		discordgo.IntentGuildMembers | discordgo.IntentGuildMessages |
 		discordgo.IntentMessageContent | discordgo.IntentGuildMessageReactions |
 		discordgo.IntentDirectMessages | discordgo.IntentDirectMessageReactions
+
+	s.LogLevel = discordgo.LogInformational
 
 	err = s.Open()
 	if err != nil {

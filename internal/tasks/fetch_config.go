@@ -8,7 +8,7 @@ import (
 )
 
 func (m *Manager) FetchBotConfigs() {
-	log.Println("Fetching all configs. . .")
+	log.Println("Fetching all configs...")
 
 	cfgs, err := zauapi.GetClient().GetConfigs()
 	if err != nil {

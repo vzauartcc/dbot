@@ -9,10 +9,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func (m *Manager) UpdateIronMic() {
-	log.Println("Running Iron Mic task. . . .")
+	log.Println("Running Iron Mic task...")
 
 	data, err := zauapi.GetClient().GetIronMic()
 	if err != nil {
@@ -107,8 +108,8 @@ func buildIronMicMessage(data models.IronMicResponse) *discordgo.MessageEmbed {
 		Color:     0x0099ff,
 		Footer: &discordgo.MessageEmbedFooter{
 			Text: fmt.Sprintf(
-				"Calculating %s%d - Updated Hourly.",
-				data.Period.Unit,
+				"%s %d - Updated Hourly.",
+				helpers.CapitalizeFirst(data.Period.Unit),
 				data.Period.CurrentPeriod,
 			),
 		},
