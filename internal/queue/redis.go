@@ -3,6 +3,7 @@ package queue
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"strings"
@@ -36,14 +37,23 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 		return
 	}
 
+	redisOpts.ClientName = "dbot"
+
 	rdb := redis.NewClient(redisOpts)
+	defer rdb.Close()
 
 	log.Println("Redis connected, listening for Discord link events...")
 
 	for {
 		result, err := rdb.BRPop(ctx, 0, "new_discord_user", "remove_discord_user").Result()
 		if err != nil {
+			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+				log.Println("Redis queue stopped, context closed")
+				return
+			}
+
 			log.Printf("Error during Redis queue: %v\n", err)
+
 			continue
 		}
 
@@ -53,7 +63,7 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 
 		err = json.Unmarshal([]byte(result[1]), &user)
 		if err != nil {
-			log.Printf("Error unmarshalling JSON data for queue: %v\n", err)
+			log.Printf("Error unmarshaling JSON data for queue: %v\n", err)
 			continue
 		}
 
