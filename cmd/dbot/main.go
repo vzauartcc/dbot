@@ -13,6 +13,7 @@ import (
 	"github.com/vzauartcc/dbot/internal/bot"
 	"github.com/vzauartcc/dbot/internal/queue"
 	"github.com/vzauartcc/dbot/internal/tasks"
+	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 var (
@@ -27,7 +28,7 @@ func main() {
 
 	zauapi.Init()
 
-	s, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN"))
+	s, err := discordgo.New("Bot " + helpers.GetBotToken())
 	if err != nil {
 		log.Println("Invalid bot parameters: ", err)
 		return

@@ -10,11 +10,11 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/cristalhq/jwt/v5"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 var (
@@ -31,7 +31,7 @@ type Client struct {
 }
 
 func Init() {
-	baseURL := os.Getenv("ZAU_API_URL")
+	baseURL := helpers.GetAPIURL()
 
 	u, err := url.Parse(baseURL)
 	if err != nil || (u.Scheme != "http" && u.Scheme != "https") {
@@ -94,7 +94,7 @@ func generateRequest[T any](
 }
 
 func generateJWT() string {
-	key := []byte(os.Getenv("ZAU_API_KEY"))
+	key := []byte(helpers.GetAPIKey())
 
 	signer, err := jwt.NewSignerHS(jwt.HS256, key)
 	if err != nil {

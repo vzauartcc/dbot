@@ -2,15 +2,15 @@ package bot
 
 import (
 	"log"
-	"os"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/vzauartcc/dbot/internal/commands"
+	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func RegisterCommands(s *discordgo.Session) {
-	guildID := os.Getenv("DISCORD_SERVER_ID")
+	guildID := helpers.GetMainDiscordServerID()
 	if strings.TrimSpace(guildID) == "" {
 		log.Println("Skipping command registration due to missing DISCORD_SERVER_ID")
 		return

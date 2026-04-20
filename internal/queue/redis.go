@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -21,13 +20,13 @@ type UserData struct {
 }
 
 func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
-	mainGuild := os.Getenv("DISCORD_SERVER_ID")
+	mainGuild := helpers.GetMainDiscordServerID()
 	if strings.TrimSpace(mainGuild) == "" {
 		log.Println("Redis queue skipped due to no DISCORD_SERVER_ID")
 		return
 	}
 
-	redisURL := os.Getenv("REDIS_URI")
+	redisURL := helpers.GetRedisURI()
 	if strings.TrimSpace(redisURL) == "" {
 		log.Println("Redis queue skipped due to no REDIS_URI")
 	}
