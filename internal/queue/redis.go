@@ -10,6 +10,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/redis/go-redis/v9"
+	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/api/models"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
@@ -45,7 +46,7 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 	log.Println("Redis connected, listening for Discord link events...")
 
 	for {
-		result, err := rdb.BRPop(ctx, 0, "new_discord_user", "remove_discord_user").Result()
+		result, err := rdb.BRPop(ctx, 0, "new_discord_user", "remove_discord_user", "config_update").Result()
 		if err != nil {
 			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 				log.Println("Redis queue stopped, context closed")
@@ -53,6 +54,26 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 			}
 
 			log.Printf("Error during Redis queue: %v\n", err)
+
+			continue
+		}
+
+		queueName := result[0]
+
+		if queueName == "config_update" {
+			log.Println("Received config update event, reloading...")
+
+			cfgs, err := zauapi.GetClient().GetConfigs()
+			if err != nil {
+				log.Printf("Error getting bot configurations: %v\n", err)
+				return
+			}
+
+			for _, cfg := range cfgs {
+				log.Println("Caching config for guild", cfg.GuildID)
+
+				models.CacheConfig(cfg)
+			}
 
 			continue
 		}
@@ -67,7 +88,6 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 			continue
 		}
 
-		queueName := result[0]
 		member, err := s.GuildMember(mainGuild, user.ID)
 
 		if queueName == "new_discord_user" {
