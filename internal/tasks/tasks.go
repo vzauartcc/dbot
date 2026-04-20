@@ -26,7 +26,7 @@ func SetupTasks(s *discordgo.Session) *cron.Cron {
 		log.Printf("Error creating AutoGiveRoles task: %v\n", err)
 	}
 
-	_, err = runner.AddFunc("0 * * * *", manager.UpdateIronMic)
+	_, err = runner.AddFunc("1 * * * *", manager.UpdateIronMic)
 	if err != nil {
 		log.Printf("Error creating UpdateIronMic task: %v\n", err)
 	}
@@ -36,12 +36,12 @@ func SetupTasks(s *discordgo.Session) *cron.Cron {
 		log.Printf("Error creating UpdateOnlineControllers task: %v\n", err)
 	}
 
-	_, err = runner.AddFunc("0 3 * * *", manager.CleanupChannels)
+	_, err = runner.AddFunc("12 3 * * *", manager.CleanupChannels)
 	if err != nil {
 		log.Printf("Error creating ChannelCleanup task: %v\n", err)
 	}
 
-	_, err = runner.AddFunc("0 0 * * *", manager.FetchBotConfigs)
+	_, err = runner.AddFunc("30 * * * *", manager.FetchBotConfigs)
 	if err != nil {
 		log.Printf("Error creating FetchBotConfigs task: %v\n", err)
 	}

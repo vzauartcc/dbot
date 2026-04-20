@@ -74,7 +74,7 @@ func main() {
 		discordgo.IntentMessageContent | discordgo.IntentGuildMessageReactions |
 		discordgo.IntentDirectMessages | discordgo.IntentDirectMessageReactions
 
-	s.LogLevel = discordgo.LogInformational
+	s.LogLevel = discordgo.LogWarning
 
 	err = s.Open()
 	if err != nil {
