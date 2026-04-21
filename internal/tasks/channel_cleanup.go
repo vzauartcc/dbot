@@ -6,6 +6,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func (m *Manager) CleanupChannels() {
@@ -55,7 +56,7 @@ func fetchAllMessages(s *discordgo.Session, channelID string) []*discordgo.Messa
 	beforeID := ""
 
 	for {
-		messages, err := s.ChannelMessages(channelID, 100, beforeID, "", "")
+		messages, err := helpers.ChannelMessages(s, channelID, 100, beforeID, "", "")
 		if err != nil {
 			break
 		}

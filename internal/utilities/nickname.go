@@ -23,7 +23,7 @@ func SetNickname(s *discordgo.Session, member *discordgo.Member, user models.Use
 	if newNick != member.Nick && !isStaff {
 		log.Printf("Updating nickname for %s to: \"%s\"\n", GetMemberName(member), newNick)
 
-		err = s.GuildMemberNickname(member.GuildID, member.User.ID, newNick)
+		err = GuildMemberNickname(s, member.GuildID, member.User.ID, newNick)
 	}
 
 	return err

@@ -19,7 +19,7 @@ func RegisterCommands(s *discordgo.Session) {
 	log.Println("Registering commands...")
 
 	for _, cmd := range commands.AllCommands {
-		_, err := s.ApplicationCommandCreate(s.State.User.ID, guildID, cmd)
+		_, err := helpers.ApplicationCommandCreate(s, guildID, cmd)
 		if err != nil {
 			log.Printf("Error registering command /%s: %v\n", cmd.Name, err)
 		}
@@ -29,23 +29,23 @@ func RegisterCommands(s *discordgo.Session) {
 }
 
 func UnregisterCommands(s *discordgo.Session) error {
-	commands, err := s.ApplicationCommands(s.State.User.ID, "")
+	commands, err := helpers.ApplicationCommands(s, "")
 	if err != nil {
 		return err
 	}
 
 	for _, v := range commands {
-		_ = s.ApplicationCommandDelete(s.State.User.ID, "", v.ID)
+		_ = helpers.ApplicationCommandDelete(s, "", v.ID)
 	}
 
 	for _, guild := range s.State.Guilds {
-		cmds, err := s.ApplicationCommands(s.State.User.ID, guild.ID)
+		cmds, err := helpers.ApplicationCommands(s, guild.ID)
 		if err != nil {
 			continue
 		}
 
 		for _, v := range cmds {
-			_ = s.ApplicationCommandDelete(s.State.User.ID, guild.ID, v.ID)
+			_ = helpers.ApplicationCommandDelete(s, guild.ID, v.ID)
 		}
 	}
 

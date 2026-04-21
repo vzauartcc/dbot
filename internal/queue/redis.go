@@ -87,7 +87,7 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 			continue
 		}
 
-		member, err := s.GuildMember(mainGuild, user.ID)
+		member, err := helpers.GuildMember(s, mainGuild, user.ID)
 
 		if queueName == "new_discord_user" {
 			// User is already a member.
@@ -100,7 +100,7 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 				continue
 			}
 
-			err = s.GuildMemberAdd(mainGuild, user.ID, &discordgo.GuildMemberAddParams{
+			err = helpers.GuildMemberAdd(s, mainGuild, user.ID, &discordgo.GuildMemberAddParams{
 				AccessToken: user.Token,
 				Nick:        "",
 				Mute:        false,
@@ -126,7 +126,7 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 
 			for _, role := range cfg.GetManagedRoles() {
 				if role.LookupKey == "sync" {
-					err = s.GuildMemberRoleRemove(mainGuild, user.ID, role.RoleID)
+					err = helpers.GuildMemberRoleRemove(s, mainGuild, user.ID, role.RoleID)
 					if err != nil {
 						log.Printf(
 							"Error removing 'sync' role from %s: %v\n",

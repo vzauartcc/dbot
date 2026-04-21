@@ -21,3 +21,9 @@ func GetBotToken() string {
 func GetRedisURI() string {
 	return os.Getenv("REDIS_URI")
 }
+
+func GetIsDevEnvironment() bool {
+	d := os.Getenv("LOCAL_DEV_ENVIRONMENT")
+
+	return d == "true"
+}

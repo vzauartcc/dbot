@@ -35,7 +35,7 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			i.GuildID,
 		)
 
-		_, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "This server is not configured for automated role handling.",
 			Flags:   discordgo.MessageFlagsEphemeral,
 		})
@@ -52,7 +52,7 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	user, err := zauapi.GetClient().GetUserByID(i.User.ID)
 	if err != nil {
-		_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "Error verifying account. Ensure your account is linked at [zauartcc.org](https://zauartcc.org/dash)",
 			Flags:   discordgo.MessageFlagsEphemeral,
 		})
@@ -73,7 +73,7 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if len(errs) != 0 {
 		log.Printf("Error processing /getroles for %s: %v\n", i.User.ID, errs)
 
-		_, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "Error updating your roles.",
 			Flags:   discordgo.MessageFlagsEphemeral,
 		})
@@ -85,7 +85,7 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			)
 		}
 	} else {
-		_, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "Roles updated!",
 			Flags:   discordgo.MessageFlagsEphemeral,
 		})

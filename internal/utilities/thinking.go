@@ -7,7 +7,7 @@ import (
 )
 
 func SendThinking(s *discordgo.Session, i *discordgo.InteractionCreate, cmd string) bool {
-	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	err := InteractionRespond(s, i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 	})
 	if err != nil {
