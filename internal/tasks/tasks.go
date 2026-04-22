@@ -4,6 +4,9 @@ import (
 	"log"
 	"time"
 
+	// Import timezone data.
+	_ "time/tzdata"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/robfig/cron/v3"
 )
@@ -13,7 +16,12 @@ type Manager struct {
 }
 
 func SetupTasks(s *discordgo.Session) *cron.Cron {
-	runner := cron.New(cron.WithLocation(time.FixedZone("America/Chicago", 0)))
+	loc, err := time.LoadLocation("America/Chicago")
+	if err != nil {
+		log.Printf("Error loading timezone: %v\n", err)
+	}
+
+	runner := cron.New(cron.WithLocation(loc))
 
 	manager := &Manager{
 		Session: s,
@@ -21,7 +29,7 @@ func SetupTasks(s *discordgo.Session) *cron.Cron {
 
 	manager.FetchBotConfigs()
 
-	_, err := runner.AddFunc("*/10 * * * *", manager.AutoGiveRoles)
+	_, err = runner.AddFunc("*/10 * * * *", manager.AutoGiveRoles)
 	if err != nil {
 		log.Printf("Error creating AutoGiveRoles task: %v\n", err)
 	}
