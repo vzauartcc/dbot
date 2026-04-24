@@ -31,9 +31,11 @@ func (m *Manager) UpdateIronMic() {
 
 		msg, err := m.Session.ChannelMessage(cfg.GetIronMicChannel(), cfg.GetIronMicMessage())
 		if err != nil || len(msg.Embeds) != 1 {
+			log.Println("Did not find Iron Mic message, sending new message...")
+
 			sentMsg, err := m.Session.ChannelMessageSendEmbed(cfg.GetIronMicChannel(), embed)
 			if err != nil {
-				log.Printf("Error sending IronMic message: %v\n", err)
+				log.Printf("Error sending new IronMic message: %v\n", err)
 			} else {
 				cfg.SetIronMicMessage(sentMsg.ID, zauapi.GetClient())
 			}

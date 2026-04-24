@@ -49,9 +49,11 @@ func (m *Manager) UpdateOnlineControllers() {
 
 		msg, err := m.Session.ChannelMessage(cfg.GetOnlineChannel(), cfg.GetOnlineMessage())
 		if err != nil || len(msg.Embeds) != 1 {
+			log.Println("Did not find existing Online Controllers message, sending new message...")
+
 			sentMsg, err := m.Session.ChannelMessageSendEmbed(cfg.GetOnlineChannel(), embed)
 			if err != nil {
-				log.Printf("Error sending Online Controllers message: %v\n", err)
+				log.Printf("Error sending new Online Controllers message: %v\n", err)
 			} else {
 				cfg.SetOnlineMessage(sentMsg.ID, zauapi.GetClient())
 			}
