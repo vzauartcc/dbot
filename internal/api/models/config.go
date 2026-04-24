@@ -84,9 +84,12 @@ func (c *Config) GetIronMicMessage() string {
 }
 
 func (c *Config) SetIronMicMessage(messageID string, api ConfigUpdater) {
+	old := c.IronMicConfig.MessageID
 	c.IronMicConfig.MessageID = messageID
 
 	c.updateConfig(api)
+
+	log.Printf("Updated Iron Mic message from %s to %s\n", old, messageID)
 }
 
 func (c *Config) GetManagedRoles() []ManagedRole {
@@ -102,9 +105,12 @@ func (c *Config) GetOnlineMessage() string {
 }
 
 func (c *Config) SetOnlineMessage(messageID string, api ConfigUpdater) {
+	old := c.OnlineControllers.MessageID
 	c.OnlineControllers.MessageID = messageID
 
 	c.updateConfig(api)
+
+	log.Printf("Updated Online Controllers message from %s to %s\n", old, messageID)
 }
 
 func (c *Config) updateConfig(service ConfigUpdater) {
@@ -113,4 +119,6 @@ func (c *Config) updateConfig(service ConfigUpdater) {
 		log.Printf("Error updating config: %v\n", err)
 		return
 	}
+
+	log.Println("Successfully updated config!")
 }

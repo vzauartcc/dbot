@@ -21,7 +21,7 @@ func (m *Manager) CleanupChannels() {
 				if msg.ID != keepMsgID {
 					total++
 
-					err := m.Session.ChannelMessageDelete(channelID, msg.ID)
+					err := helpers.ChannelMessageDelete(m.Session, channelID, msg.ID)
 					if err != nil {
 						log.Printf(
 							"Error deleting message %s in channel %s: %v\n",

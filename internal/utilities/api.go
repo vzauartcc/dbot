@@ -42,6 +42,11 @@ func GuildMember(s *discordgo.Session, guildID, userID string, options ...discor
 	return s.GuildMember(guildID, userID, options...)
 }
 
+func RequestGuildMembers(s *discordgo.Session, guildID, query string, limit int, nonce string, presences bool) error {
+	// Read-only endpoint; environment check not needed for this API call.
+	return s.RequestGuildMembers(guildID, query, limit, nonce, presences)
+}
+
 func GuildMemberAdd(s *discordgo.Session, guildID, userID string, data *discordgo.GuildMemberAddParams, options ...discordgo.RequestOption) error {
 	if GetIsDevEnvironment() {
 		return ErrDevEnvironment
@@ -81,6 +86,16 @@ func GuildRoles(s *discordgo.Session, guildID string, options ...discordgo.Reque
 	return s.GuildRoles(guildID, options...)
 }
 
+// Handlers
+
+func AddHandler(s *discordgo.Session, handler any) func() {
+	if GetIsDevEnvironment() {
+		return func() {}
+	}
+
+	return s.AddHandler(handler)
+}
+
 // Interactions
 
 func InteractionRespond(s *discordgo.Session, interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error {
@@ -111,6 +126,14 @@ func ChannelMessages(s *discordgo.Session, channelID string, limit int, beforeID
 	return s.ChannelMessages(channelID, limit, beforeID, afterID, aroundID, options...)
 }
 
+func ChannelMessageEditComplex(s *discordgo.Session, m *discordgo.MessageEdit, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+	if GetIsDevEnvironment() {
+		return nil, ErrDevEnvironment
+	}
+
+	return s.ChannelMessageEditComplex(m, options...)
+}
+
 func ChannelMessageSend(s *discordgo.Session, channelID, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
 	if GetIsDevEnvironment() {
 		return nil, ErrDevEnvironment
@@ -125,6 +148,14 @@ func ChannelMessageSendComplex(s *discordgo.Session, channelID string, data *dis
 	}
 
 	return s.ChannelMessageSendComplex(channelID, data, options...)
+}
+
+func ChannelMessageSendEmbed(s *discordgo.Session, channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+	if GetIsDevEnvironment() {
+		return nil, ErrDevEnvironment
+	}
+
+	return s.ChannelMessageSendEmbed(channelID, embed, options...)
 }
 
 func ChannelMessageDelete(s *discordgo.Session, channelID, messageID string, options ...discordgo.RequestOption) error {

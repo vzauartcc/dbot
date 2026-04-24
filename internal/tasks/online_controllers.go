@@ -9,6 +9,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func (m *Manager) UpdateOnlineControllers() {
@@ -47,11 +48,11 @@ func (m *Manager) UpdateOnlineControllers() {
 			continue
 		}
 
-		msg, err := m.Session.ChannelMessage(cfg.GetOnlineChannel(), cfg.GetOnlineMessage())
+		msg, err := helpers.ChannelMessage(m.Session, cfg.GetOnlineChannel(), cfg.GetOnlineMessage())
 		if err != nil || len(msg.Embeds) != 1 {
 			log.Println("Did not find existing Online Controllers message, sending new message...")
 
-			sentMsg, err := m.Session.ChannelMessageSendEmbed(cfg.GetOnlineChannel(), embed)
+			sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetOnlineChannel(), embed)
 			if err != nil {
 				log.Printf("Error sending new Online Controllers message: %v\n", err)
 			} else {
@@ -67,7 +68,7 @@ func (m *Manager) UpdateOnlineControllers() {
 			Embeds:  &[]*discordgo.MessageEmbed{embed},
 		}
 
-		_, err = m.Session.ChannelMessageEditComplex(edit)
+		_, err = helpers.ChannelMessageEditComplex(m.Session, edit)
 		if err != nil {
 			log.Printf("Error updating Online Controllers message: %v\n", err)
 		}
