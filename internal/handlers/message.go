@@ -36,13 +36,22 @@ func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
 }
 
 func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate, title string) {
+	if message.Member == nil {
+		log.Println("Repost channel came across a nil member")
+	}
+
+	avatarURL := message.Author.AvatarURL("")
+	if message.Member != nil {
+		avatarURL = message.Member.AvatarURL("")
+	}
+
 	embed := &discordgo.MessageEmbed{
 		Title:       title,
 		Description: message.Content,
 		Color:       0x0099ff,
 		Footer: &discordgo.MessageEmbedFooter{
-			Text:    message.Member.Nick,
-			IconURL: message.Member.AvatarURL(""),
+			Text:    helpers.GetMemberName(message.Member),
+			IconURL: avatarURL,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}
