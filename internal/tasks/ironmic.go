@@ -102,8 +102,6 @@ func buildIronMicMessage(data models.IronMicResponse) *discordgo.MessageEmbed {
 		)
 	}
 
-	log.Printf("Updating Iron Mic body to:\n%s\n", descriptionBuilder.String())
-
 	return &discordgo.MessageEmbed{
 		Title:     "Top 3 Quarter Totals for All Ratings",
 		Timestamp: time.Now().Format(time.RFC3339),

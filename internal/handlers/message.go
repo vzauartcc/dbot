@@ -36,13 +36,14 @@ func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
 }
 
 func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate, title string) {
-	if message.Member == nil {
-		log.Println("Repost channel came across a nil member")
+	avatarURL := message.Author.AvatarURL("")
+	if message.Member != nil && message.Member.Avatar != "" {
+		avatarURL = message.Member.AvatarURL("")
 	}
 
-	avatarURL := message.Author.AvatarURL("")
+	username := message.Author.Username
 	if message.Member != nil {
-		avatarURL = message.Member.AvatarURL("")
+		username = message.Member.Nick
 	}
 
 	embed := &discordgo.MessageEmbed{
@@ -50,7 +51,7 @@ func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate,
 		Description: message.Content,
 		Color:       0x0099ff,
 		Footer: &discordgo.MessageEmbedFooter{
-			Text:    helpers.GetMemberName(message.Member),
+			Text:    username,
 			IconURL: avatarURL,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -88,12 +89,13 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 	}
 
 	if reminderMessages[message.ChannelID] == "" {
+		log.Printf("No existing reminder message in %s, creating\n", message.ChannelID)
 		sendMessage(s, message.ChannelID, content)
 
 		return
 	}
 
-	msg, err := helpers.ChannelMessage(s, message.ChannelID, reminderMessages[message.ChannelID])
+	oldReminderMessage, err := helpers.ChannelMessage(s, message.ChannelID, reminderMessages[message.ChannelID])
 	if err != nil {
 		log.Printf(
 			"Error getting existing reminder message in %s. Sending a new one. %v\n",
@@ -106,13 +108,15 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 		return
 	}
 
-	if time.Since(message.Timestamp) >= 90*time.Second {
-		err = helpers.ChannelMessageDelete(s, message.ChannelID, msg.ID)
+	if time.Since(oldReminderMessage.Timestamp) >= 90*time.Second {
+		err = helpers.ChannelMessageDelete(s, oldReminderMessage.ChannelID, oldReminderMessage.ID)
 		if err != nil {
 			log.Printf("Error deleting old reminder message in %s: %v\n", message.ChannelID, err)
 		}
 
 		sendMessage(s, message.ChannelID, content)
+	} else {
+		log.Printf("Reminder message in %s is less than 90 seconds old: %v\n", message.ChannelID, time.Since(oldReminderMessage.Timestamp))
 	}
 }
 
