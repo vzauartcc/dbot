@@ -128,7 +128,7 @@ func ExchangeRoles(
 			continue
 		}
 
-		err := s.GuildMemberRoleAdd(member.GuildID, member.User.ID, toAdd)
+		err := GuildMemberRoleAdd(s, member.GuildID, member.User.ID, toAdd)
 		if err != nil {
 			errors = append(errors, fmt.Errorf("error giving role %s: %w", toAdd, err))
 		} else {
@@ -143,7 +143,7 @@ func ExchangeRoles(
 			continue
 		}
 
-		err := s.GuildMemberRoleRemove(member.GuildID, member.User.ID, toRemove)
+		err := GuildMemberRoleRemove(s, member.GuildID, member.User.ID, toRemove)
 		if err != nil {
 			errors = append(errors, fmt.Errorf("error revoking role %s: %w", toRemove, err))
 		} else {
@@ -156,7 +156,7 @@ func ExchangeRoles(
 		msg = "Partial Role Change Report (Error giving or taking roles):\n\n"
 	}
 
-	allRoles, err := s.GuildRoles(member.GuildID)
+	allRoles, err := GuildRoles(s, member.GuildID)
 	if err != nil {
 		log.Printf("Error getting roles for role report: %v\n", err)
 		return errors
@@ -180,7 +180,7 @@ func ExchangeRoles(
 		}
 	}
 
-	_, err = s.ChannelMessageSend(
+	_, err = ChannelMessageSend(s,
 		"1059182797476077588",
 		fmt.Sprintf(
 			"%s\n\n%s - Added: %s\n%s - Removed: %s\n\nCause: %s at %s",

@@ -7,6 +7,8 @@ import (
 )
 
 func TestGetMemberName_NoNick(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	mockMember := &discordgo.Member{
 		Nick: "",
 		User: &discordgo.User{
@@ -25,6 +27,8 @@ func TestGetMemberName_NoNick(t *testing.T) {
 }
 
 func TestGetMemberName_Nick(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	mockMember := &discordgo.Member{
 		Nick: "John Doe",
 		User: &discordgo.User{

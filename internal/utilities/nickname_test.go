@@ -7,6 +7,8 @@ import (
 )
 
 func TestCalculateNewNickname(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	cases := []struct {
 		user   models.User
 		expect string
