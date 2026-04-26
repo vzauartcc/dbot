@@ -29,11 +29,13 @@ func (m *Manager) UpdateIronMic() {
 			continue
 		}
 
-		msg, err := m.Session.ChannelMessage(cfg.GetIronMicChannel(), cfg.GetIronMicMessage())
+		msg, err := helpers.ChannelMessage(m.Session, cfg.GetIronMicChannel(), cfg.GetIronMicMessage())
 		if err != nil || len(msg.Embeds) != 1 {
-			sentMsg, err := m.Session.ChannelMessageSendEmbed(cfg.GetIronMicChannel(), embed)
+			log.Println("Did not find Iron Mic message, sending new message...")
+
+			sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetIronMicChannel(), embed)
 			if err != nil {
-				log.Printf("Error sending IronMic message: %v\n", err)
+				log.Printf("Error sending new IronMic message: %v\n", err)
 			} else {
 				cfg.SetIronMicMessage(sentMsg.ID, zauapi.GetClient())
 			}
@@ -47,7 +49,7 @@ func (m *Manager) UpdateIronMic() {
 			Embeds:  &[]*discordgo.MessageEmbed{embed},
 		}
 
-		_, err = m.Session.ChannelMessageEditComplex(edit)
+		_, err = helpers.ChannelMessageEditComplex(m.Session, edit)
 		if err != nil {
 			log.Printf("Error updating Iron Mic message: %v\n", err)
 		}

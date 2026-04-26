@@ -21,6 +21,8 @@ func initClient(t *testing.T, srvURL string) {
 
 // Test successful GetUsers call with correct headers and JSON decoding.
 func TestGetUsersSuccess(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	var capturedReq *http.Request
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
@@ -62,6 +64,8 @@ func TestGetUsersSuccess(t *testing.T) {
 
 // Test that non-200 status returns ErrStatusCode error with code.
 func TestGetUsersBadStatus(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
 		writer.WriteHeader(http.StatusInternalServerError)
 	}))
@@ -77,6 +81,8 @@ func TestGetUsersBadStatus(t *testing.T) {
 
 // Test that malformed JSON returns ErrDecoding.
 func TestGetUsersBadJSON(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
 		writer.WriteHeader(http.StatusOK)
 		_, _ = writer.Write([]byte("{invalid}"))
@@ -93,6 +99,8 @@ func TestGetUsersBadJSON(t *testing.T) {
 
 // Test GetUserByID success.
 func TestGetUserByIDSuccess(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	var capturedReq *http.Request
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
@@ -124,6 +132,8 @@ func TestGetUserByIDSuccess(t *testing.T) {
 
 // Test GetUserByID non-200.
 func TestGetUserByIDBadStatus(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	srv := httpTest.NewServer(
 		http.HandlerFunc(
 			func(writer http.ResponseWriter, _ *http.Request) { writer.WriteHeader(http.StatusNotFound) },
@@ -141,6 +151,8 @@ func TestGetUserByIDBadStatus(t *testing.T) {
 
 // Test GetIronMic success.
 func TestGetIronMicSuccess(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	var capturedReq *http.Request
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
@@ -171,6 +183,8 @@ func TestGetIronMicSuccess(t *testing.T) {
 
 // Test GetOnlineATC success.
 func TestGetOnlineATCSuccess(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	var capturedReq *http.Request
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
@@ -198,6 +212,8 @@ func TestGetOnlineATCSuccess(t *testing.T) {
 
 // Test GetStaff success.
 func TestGetStaffSuccess(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	var capturedReq *http.Request
 
 	srv := httpTest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
@@ -225,6 +241,8 @@ func TestGetStaffSuccess(t *testing.T) {
 
 // Test JWT generation.
 func TestGenerateJWT(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	testKey := "super-secret-test-key"
 	t.Setenv("ZAU_API_KEY", testKey)
 

@@ -18,9 +18,9 @@ func PingHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	latency := s.HeartbeatLatency()
+	latency := helpers.HeartbeatLatency(s)
 
-	_, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+	_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 		Content: fmt.Sprintf(":ping_pong: Pong! My latency is %dms", latency.Milliseconds()),
 		Flags:   discordgo.MessageFlagsEphemeral,
 	})

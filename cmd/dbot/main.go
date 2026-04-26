@@ -13,6 +13,7 @@ import (
 	"github.com/vzauartcc/dbot/internal/bot"
 	"github.com/vzauartcc/dbot/internal/queue"
 	"github.com/vzauartcc/dbot/internal/tasks"
+	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 var (
@@ -27,7 +28,7 @@ func main() {
 
 	zauapi.Init()
 
-	s, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN"))
+	s, err := discordgo.New("Bot " + helpers.GetBotToken())
 	if err != nil {
 		log.Println("Invalid bot parameters: ", err)
 		return
@@ -56,7 +57,7 @@ func main() {
 	})
 
 	// Special registration for the Disconnect event to handle retry logic..
-	s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Disconnect) {
+	disconnectHandler := s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Disconnect) {
 		log.Println("==========>  Discord connection lost, waiting for reconnect...")
 
 		retryMutex.Lock()
@@ -74,7 +75,11 @@ func main() {
 		discordgo.IntentMessageContent | discordgo.IntentGuildMessageReactions |
 		discordgo.IntentDirectMessages | discordgo.IntentDirectMessageReactions
 
-	s.LogLevel = discordgo.LogWarning
+	if helpers.GetIsDevEnvironment() {
+		s.LogLevel = discordgo.LogInformational
+	} else {
+		s.LogLevel = discordgo.LogWarning
+	}
 
 	err = s.Open()
 	if err != nil {
@@ -94,6 +99,8 @@ func main() {
 	log.Printf("Tasks running: %d\n", len(runner.Entries()))
 
 	<-ctx.Done()
+
+	disconnectHandler()
 
 	stopCtx := runner.Stop()
 

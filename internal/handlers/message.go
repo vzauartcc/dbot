@@ -7,6 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 var reminderMessages map[string]string
@@ -51,7 +52,7 @@ func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate,
 		attachments = append(attachments, a.URL)
 	}
 
-	_, err := s.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
+	_, err := helpers.ChannelMessageSendComplex(s, message.ChannelID, &discordgo.MessageSend{
 		Embeds:  []*discordgo.MessageEmbed{embed},
 		Content: strings.Join(attachments, "\n"),
 	})
@@ -61,7 +62,7 @@ func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate,
 		return
 	}
 
-	err = s.ChannelMessageDelete(message.ChannelID, message.ID)
+	err = helpers.ChannelMessageDelete(s, message.ChannelID, message.ID)
 	if err != nil {
 		log.Printf(
 			"Error deleting message %s in report channel %s: %v\n",
@@ -83,7 +84,7 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 		return
 	}
 
-	msg, err := s.ChannelMessage(message.ChannelID, reminderMessages[message.ChannelID])
+	msg, err := helpers.ChannelMessage(s, message.ChannelID, reminderMessages[message.ChannelID])
 	if err != nil {
 		log.Printf(
 			"Error getting existing reminder message in %s. Sending a new one. %v\n",
@@ -97,7 +98,7 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 	}
 
 	if time.Since(message.Timestamp) >= 90*time.Second {
-		err = s.ChannelMessageDelete(message.ChannelID, msg.ID)
+		err = helpers.ChannelMessageDelete(s, message.ChannelID, msg.ID)
 		if err != nil {
 			log.Printf("Error deleting old reminder message in %s: %v\n", message.ChannelID, err)
 		}
@@ -107,7 +108,7 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 }
 
 func sendMessage(s *discordgo.Session, channelID, content string) {
-	msg, err := s.ChannelMessageSend(channelID, content)
+	msg, err := helpers.ChannelMessageSend(s, channelID, content)
 	if err != nil {
 		log.Printf("Error sending reminder message in %s: %v\n", channelID, err)
 		return

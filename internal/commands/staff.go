@@ -25,7 +25,7 @@ func StaffHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		log.Printf("Error getting staff members: %v\n", err)
 
-		_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "An error has occurred.",
 		})
 		if err != nil {
@@ -41,7 +41,7 @@ func StaffHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	embed := generateStaffEmbed(staff)
 
-	_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+	_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 		Embeds: []*discordgo.MessageEmbed{embed},
 	})
 	if err != nil {

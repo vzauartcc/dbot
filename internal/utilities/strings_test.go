@@ -5,6 +5,8 @@ import (
 )
 
 func TestCapitalizeFirst(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	tests := []struct {
 		name  string
 		input string
@@ -68,6 +70,8 @@ func TestCapitalizeFirst(t *testing.T) {
 }
 
 func TestTitleCase(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	tests := []struct {
 		name     string
 		input    string

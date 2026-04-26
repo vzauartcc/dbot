@@ -42,6 +42,8 @@ func assertSliceEqual(t *testing.T, got []string, expected ...string) {
 }
 
 func TestRolesToAdd_MemberNonVisitor(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	cfg := newConfig(
 		models.ManagedRole{LookupKey: "HOME", RoleID: "idHome"},
 		models.ManagedRole{LookupKey: "SUS", RoleID: "idSus"})
@@ -58,6 +60,8 @@ func TestRolesToAdd_MemberNonVisitor(t *testing.T) {
 }
 
 func TestRolesToAdd_MemberVis_Cert_Zhq_Rating4(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	cfg := newConfig(
 		models.ManagedRole{LookupKey: "VIS", RoleID: "idVis"},
 		models.ManagedRole{LookupKey: "S3", RoleID: "idS3"},
@@ -77,6 +81,8 @@ func TestRolesToAdd_MemberVis_Cert_Zhq_Rating4(t *testing.T) {
 }
 
 func TestRolesToAdd_NonMember_Guest_Rating1(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	cfg := newConfig(
 		models.ManagedRole{LookupKey: "GUEST", RoleID: "idGuest"},
 		models.ManagedRole{LookupKey: "OBS", RoleID: "idObs"})
@@ -92,6 +98,8 @@ func TestRolesToAdd_NonMember_Guest_Rating1(t *testing.T) {
 }
 
 func TestCalculateRoles_NoChanges(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	cfg := newConfig(
 		models.ManagedRole{LookupKey: "A", RoleID: "idA"},
 		models.ManagedRole{LookupKey: "B", RoleID: "idB"})
@@ -106,6 +114,8 @@ func TestCalculateRoles_NoChanges(t *testing.T) {
 }
 
 func TestCalculateRoles_AddOnly(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	cfg := newConfig(
 		models.ManagedRole{LookupKey: "A", RoleID: "idA"},
 		models.ManagedRole{LookupKey: "B", RoleID: "idB"},
@@ -123,6 +133,8 @@ func TestCalculateRoles_AddOnly(t *testing.T) {
 }
 
 func TestCalculateRoles_RemoveOnly(t *testing.T) {
+	t.Setenv("LOCAL_DEV_ENVIRONMENT", "true")
+
 	cfg := newConfig(
 		models.ManagedRole{LookupKey: "A", RoleID: "idA"},
 		models.ManagedRole{LookupKey: "B", RoleID: "idB"})
