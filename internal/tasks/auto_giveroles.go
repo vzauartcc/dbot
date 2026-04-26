@@ -96,7 +96,7 @@ func (m *Manager) FetchGuildMembers(guildID string) []*discordgo.Member {
 	stop := make(chan struct{})
 	nonce := "fetch-members-" + guildID
 
-	removeHandler := helpers.AddHandler(m.Session, func(_ *discordgo.Session, chunk *discordgo.GuildMembersChunk) {
+	removeHandler := m.Session.AddHandler(func(_ *discordgo.Session, chunk *discordgo.GuildMembersChunk) {
 		if chunk.Nonce != nonce {
 			return
 		}

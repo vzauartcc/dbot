@@ -86,16 +86,6 @@ func GuildRoles(s *discordgo.Session, guildID string, options ...discordgo.Reque
 	return s.GuildRoles(guildID, options...)
 }
 
-// Handlers
-
-func AddHandler(s *discordgo.Session, handler any) func() {
-	if GetIsDevEnvironment() {
-		return func() {}
-	}
-
-	return s.AddHandler(handler)
-}
-
 // Interactions
 
 func InteractionRespond(s *discordgo.Session, interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error {

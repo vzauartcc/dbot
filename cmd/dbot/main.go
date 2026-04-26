@@ -57,7 +57,7 @@ func main() {
 	})
 
 	// Special registration for the Disconnect event to handle retry logic..
-	s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Disconnect) {
+	disconnectHandler := s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Disconnect) {
 		log.Println("==========>  Discord connection lost, waiting for reconnect...")
 
 		retryMutex.Lock()
@@ -75,7 +75,11 @@ func main() {
 		discordgo.IntentMessageContent | discordgo.IntentGuildMessageReactions |
 		discordgo.IntentDirectMessages | discordgo.IntentDirectMessageReactions
 
-	s.LogLevel = discordgo.LogWarning
+	if helpers.GetIsDevEnvironment() {
+		s.LogLevel = discordgo.LogInformational
+	} else {
+		s.LogLevel = discordgo.LogWarning
+	}
 
 	err = s.Open()
 	if err != nil {
@@ -95,6 +99,8 @@ func main() {
 	log.Printf("Tasks running: %d\n", len(runner.Entries()))
 
 	<-ctx.Done()
+
+	disconnectHandler()
 
 	stopCtx := runner.Stop()
 
