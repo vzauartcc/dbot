@@ -12,11 +12,9 @@ import (
 )
 
 func (m *Manager) AutoGiveRoles() {
-	log.Printf("Starting automatic role sync\n")
-
 	cfg, ok := models.GetConfig(helpers.GetMainDiscordServerID())
 	if !ok {
-		log.Println("Skipping AutoGiveRoles due to no config")
+		log.Println("[AutoRoles] Skipping AutoGiveRoles due to no config")
 		return
 	}
 
@@ -31,7 +29,7 @@ func (m *Manager) AutoGiveRoles() {
 
 	users, err := zauapi.GetClient().GetUsers()
 	if err != nil {
-		log.Printf("Error getting users for AutoGiveRoles task: %v\n", err)
+		log.Printf("[AutoRoles] Error getting linked accounts for AutoGiveRoles task: %v\n", err)
 		return
 	}
 
@@ -83,11 +81,9 @@ func (m *Manager) AutoGiveRoles() {
 	for _, toRemove := range toRemove {
 		err := helpers.GuildMemberRoleRemove(m.Session, toRemove.GuildID, toRemove.User.ID, syncRole)
 		if err != nil {
-			log.Printf("Error removing sync role from %s: %v\n", helpers.GetMemberName(toRemove), err)
+			log.Printf("[AutoRoles] Error removing sync role from %s: %v\n", helpers.GetMemberName(toRemove), err)
 		}
 	}
-
-	log.Printf("Automatic role sync complete!\n")
 }
 
 func (m *Manager) FetchGuildMembers(guildID string) []*discordgo.Member {
@@ -112,7 +108,7 @@ func (m *Manager) FetchGuildMembers(guildID string) []*discordgo.Member {
 
 	err := helpers.RequestGuildMembers(m.Session, guildID, "", 0, nonce, false)
 	if err != nil {
-		log.Printf("Error fetching members: %v\n", err)
+		log.Printf("[AutoRoles] Error fetching members: %v\n", err)
 		return nil
 	}
 

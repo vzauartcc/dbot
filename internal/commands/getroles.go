@@ -50,7 +50,7 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	user, err := zauapi.GetClient().GetUserByID(i.User.ID)
+	user, err := zauapi.GetClient().GetUserByID(i.Member.User.ID)
 	if err != nil {
 		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "Error verifying account. Ensure your account is linked at [zauartcc.org](https://zauartcc.org/dash)",

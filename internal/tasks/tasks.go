@@ -49,7 +49,7 @@ func SetupTasks(s *discordgo.Session) *cron.Cron {
 		log.Printf("Error creating ChannelCleanup task: %v\n", err)
 	}
 
-	_, err = runner.AddFunc("30 * * * *", manager.FetchBotConfigs)
+	_, err = runner.AddFunc("*/14 * * * *", manager.FetchBotConfigs)
 	if err != nil {
 		log.Printf("Error creating FetchBotConfigs task: %v\n", err)
 	}
