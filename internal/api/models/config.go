@@ -4,6 +4,7 @@ import (
 	"log"
 	"maps"
 	"slices"
+	"sync"
 )
 
 type Config struct {
@@ -38,8 +39,12 @@ type ConfigUpdate struct {
 }
 
 var configs map[string]*Config
+var mutex sync.RWMutex
 
 func GetConfig(guildID string) (*Config, bool) {
+	mutex.RLock()
+	defer mutex.RUnlock()
+
 	if cfg, ok := configs[guildID]; ok {
 		return cfg, true
 	}
@@ -48,10 +53,16 @@ func GetConfig(guildID string) (*Config, bool) {
 }
 
 func GetConfigs() []*Config {
+	mutex.RLock()
+	defer mutex.RUnlock()
+
 	return slices.Collect(maps.Values(configs))
 }
 
 func CacheConfig(config Config) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	if configs == nil {
 		configs = make(map[string]*Config)
 	}
@@ -84,6 +95,9 @@ func (c *Config) GetIronMicMessage() string {
 }
 
 func (c *Config) SetIronMicMessage(messageID string, api ConfigUpdater) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	old := c.IronMicConfig.MessageID
 	c.IronMicConfig.MessageID = messageID
 
@@ -105,6 +119,9 @@ func (c *Config) GetOnlineMessage() string {
 }
 
 func (c *Config) SetOnlineMessage(messageID string, api ConfigUpdater) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	old := c.OnlineControllers.MessageID
 	c.OnlineControllers.MessageID = messageID
 

@@ -50,7 +50,8 @@ func (m *Manager) UpdateOnlineControllers() {
 
 		msg, err := helpers.ChannelMessage(m.Session, cfg.GetOnlineChannel(), cfg.GetOnlineMessage())
 		if err != nil || len(msg.Embeds) != 1 {
-			log.Println("Did not find existing Online Controllers message, sending new message...")
+			log.Printf("Error getting existing Online Controllers message: %v\n", err)
+			log.Println("Sending new Online Controllers message...")
 
 			sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetOnlineChannel(), embed)
 			if err != nil {
