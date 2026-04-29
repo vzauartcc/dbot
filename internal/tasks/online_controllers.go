@@ -12,6 +12,8 @@ import (
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
+var waitTimes = []time.Duration{0, 1 * time.Second, 5 * time.Second, 10 * time.Second}
+
 func (m *Manager) UpdateOnlineControllers() {
 	online, err := zauapi.GetClient().GetOnlineATC()
 	if err != nil {
@@ -48,30 +50,35 @@ func (m *Manager) UpdateOnlineControllers() {
 			continue
 		}
 
-		msg, err := helpers.ChannelMessage(m.Session, cfg.GetOnlineChannel(), cfg.GetOnlineMessage())
-		if err != nil || len(msg.Embeds) != 1 {
-			log.Printf("Error getting existing Online Controllers message: %v\n", err)
-			log.Println("Sending new Online Controllers message...")
-
-			sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetOnlineChannel(), embed)
-			if err != nil {
-				log.Printf("Error sending new Online Controllers message: %v\n", err)
-			} else {
-				cfg.SetOnlineMessage(sentMsg.ID, zauapi.GetClient())
-			}
-
-			return
-		}
-
 		edit := &discordgo.MessageEdit{
-			ID:      msg.ID,
-			Channel: msg.ChannelID,
+			ID:      cfg.GetOnlineMessage(),
+			Channel: cfg.GetOnlineChannel(),
 			Embeds:  &[]*discordgo.MessageEmbed{embed},
 		}
 
-		_, err = helpers.ChannelMessageEditComplex(m.Session, edit)
+		for _, delay := range waitTimes {
+			time.Sleep(delay)
+
+			_, err := helpers.ChannelMessageEditComplex(m.Session, edit)
+			if err == nil {
+				return
+			}
+
+			// If message is deleted (404), immediately go to send.
+			if strings.Contains(err.Error(), "404") {
+				break
+			}
+
+			log.Printf("Retrying Online Controllers edit due to error: %v\n", err)
+		}
+
+		log.Println("Sending new Online Controllers message...")
+
+		sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetOnlineChannel(), embed)
 		if err != nil {
-			log.Printf("Error updating Online Controllers message: %v\n", err)
+			log.Printf("Error sending new Online Controllers message: %v\n", err)
+		} else {
+			cfg.SetOnlineMessage(sentMsg.ID, zauapi.GetClient())
 		}
 	}
 }
