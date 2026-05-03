@@ -12,8 +12,6 @@ import (
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
-var waitTimes = []time.Duration{0, 1 * time.Second, 5 * time.Second, 10 * time.Second}
-
 func (m *Manager) UpdateOnlineControllers() {
 	online, err := zauapi.GetClient().GetOnlineATC()
 	if err != nil {
@@ -56,23 +54,12 @@ func (m *Manager) UpdateOnlineControllers() {
 			Embeds:  &[]*discordgo.MessageEmbed{embed},
 		}
 
-		for _, delay := range waitTimes {
-			time.Sleep(delay)
-
-			_, err := helpers.ChannelMessageEditComplex(m.Session, edit)
-			if err == nil {
-				return
-			}
-
-			// If message is deleted (404), immediately go to send.
-			if strings.Contains(err.Error(), "404") {
-				break
-			}
-
-			log.Printf("Retrying Online Controllers edit due to error: %v\n", err)
+		err := helpers.TryMessageEdit(m.Session, edit, "Online Controllers")
+		if err == nil {
+			return
 		}
 
-		log.Println("Sending new Online Controllers message...")
+		log.Println("Could not edit Online Controllers message, sending new message...")
 
 		sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetOnlineChannel(), embed)
 		if err != nil {
