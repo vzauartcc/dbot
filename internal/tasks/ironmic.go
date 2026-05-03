@@ -29,29 +29,24 @@ func (m *Manager) UpdateIronMic() {
 			continue
 		}
 
-		msg, err := helpers.ChannelMessage(m.Session, cfg.GetIronMicChannel(), cfg.GetIronMicMessage())
-		if err != nil || len(msg.Embeds) != 1 {
-			log.Println("Did not find Iron Mic message, sending new message...")
-
-			sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetIronMicChannel(), embed)
-			if err != nil {
-				log.Printf("Error sending new IronMic message: %v\n", err)
-			} else {
-				cfg.SetIronMicMessage(sentMsg.ID, zauapi.GetClient())
-			}
-
-			return
-		}
-
 		edit := &discordgo.MessageEdit{
-			ID:      msg.ID,
-			Channel: msg.ChannelID,
+			ID:      cfg.GetIronMicMessage(),
+			Channel: cfg.GetIronMicChannel(),
 			Embeds:  &[]*discordgo.MessageEmbed{embed},
 		}
 
-		_, err = helpers.ChannelMessageEditComplex(m.Session, edit)
+		err := helpers.TryMessageEdit(m.Session, edit, "Iron Mic")
+		if err == nil {
+			return
+		}
+
+		log.Println("Could not edit Iron Mic message, sending new message...")
+
+		sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetIronMicChannel(), embed)
 		if err != nil {
-			log.Printf("Error updating Iron Mic message: %v\n", err)
+			log.Printf("Error sending new IronMic message: %v\n", err)
+		} else {
+			cfg.SetIronMicMessage(sentMsg.ID, zauapi.GetClient())
 		}
 	}
 }

@@ -48,30 +48,24 @@ func (m *Manager) UpdateOnlineControllers() {
 			continue
 		}
 
-		msg, err := helpers.ChannelMessage(m.Session, cfg.GetOnlineChannel(), cfg.GetOnlineMessage())
-		if err != nil || len(msg.Embeds) != 1 {
-			log.Printf("Error getting existing Online Controllers message: %v\n", err)
-			log.Println("Sending new Online Controllers message...")
-
-			sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetOnlineChannel(), embed)
-			if err != nil {
-				log.Printf("Error sending new Online Controllers message: %v\n", err)
-			} else {
-				cfg.SetOnlineMessage(sentMsg.ID, zauapi.GetClient())
-			}
-
-			return
-		}
-
 		edit := &discordgo.MessageEdit{
-			ID:      msg.ID,
-			Channel: msg.ChannelID,
+			ID:      cfg.GetOnlineMessage(),
+			Channel: cfg.GetOnlineChannel(),
 			Embeds:  &[]*discordgo.MessageEmbed{embed},
 		}
 
-		_, err = helpers.ChannelMessageEditComplex(m.Session, edit)
+		err := helpers.TryMessageEdit(m.Session, edit, "Online Controllers")
+		if err == nil {
+			return
+		}
+
+		log.Println("Could not edit Online Controllers message, sending new message...")
+
+		sentMsg, err := helpers.ChannelMessageSendEmbed(m.Session, cfg.GetOnlineChannel(), embed)
 		if err != nil {
-			log.Printf("Error updating Online Controllers message: %v\n", err)
+			log.Printf("Error sending new Online Controllers message: %v\n", err)
+		} else {
+			cfg.SetOnlineMessage(sentMsg.ID, zauapi.GetClient())
 		}
 	}
 }
