@@ -90,7 +90,12 @@ func main() {
 
 	bot.RegisterCommands(s)
 
-	go queue.StartRedisQueue(ctx, s)
+	err = queue.ConnectRedis(ctx)
+	if err != nil {
+		log.Printf("Error connecting to Redis: %v\n", err)
+	} else {
+		go queue.StartRedisQueue(s)
+	}
 
 	runner := tasks.SetupTasks(s)
 
@@ -107,6 +112,8 @@ func main() {
 	<-stopCtx.Done()
 
 	log.Println("Shutting down...")
+
+	queue.DisconnectRedis()
 
 	err = bot.UnregisterCommands(s)
 	if err != nil {

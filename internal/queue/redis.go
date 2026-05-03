@@ -19,33 +19,95 @@ type UserData struct {
 	Token string `json:"token"`
 }
 
-func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
+var (
+	instance        *Instance
+	ErrNotConnected = errors.New("redis not connected")
+)
+
+type Instance struct {
+	client *redis.Client
+	ctx    context.Context
+}
+
+func ConnectRedis(ctx context.Context) error {
+	redisURL := helpers.GetRedisURI()
+	if strings.TrimSpace(redisURL) == "" {
+		return ErrNotConnected
+	}
+
+	redisOpts, err := redis.ParseURL(redisURL)
+	if err != nil {
+		return err
+	}
+
+	redisOpts.ClientName = "dbot"
+
+	instance = &Instance{
+		client: redis.NewClient(redisOpts),
+		ctx:    ctx,
+	}
+
+	return nil
+}
+
+func DisconnectRedis() {
+	if instance == nil || instance.client == nil {
+		return
+	}
+
+	instance.client.Close()
+}
+
+func GetReminderMessage(channelID string) (string, error) {
+	if instance == nil || instance.client == nil {
+		return "", ErrNotConnected
+	}
+
+	key := "dbot:reminder:" + channelID
+
+	result, err := instance.client.Get(instance.ctx, key).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return "", nil
+		}
+
+		return "", err
+	}
+
+	return result, nil
+}
+
+func SetReminderMessage(channelID string, messageID string) error {
+	if instance == nil || instance.client == nil {
+		return ErrNotConnected
+	}
+
+	key := "dbot:reminder:" + channelID
+
+	err := instance.client.Set(instance.ctx, key, messageID, 0).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func StartRedisQueue(s *discordgo.Session) {
 	mainGuild := helpers.GetMainDiscordServerID()
 	if strings.TrimSpace(mainGuild) == "" {
 		log.Println("Redis queue skipped due to no DISCORD_SERVER_ID")
 		return
 	}
 
-	redisURL := helpers.GetRedisURI()
-	if strings.TrimSpace(redisURL) == "" {
-		log.Println("Redis queue skipped due to no REDIS_URI")
-	}
-
-	redisOpts, err := redis.ParseURL(redisURL)
-	if err != nil {
-		log.Printf("Redis queue skipped due to Redis URL parsing error: %v\n", err)
-		return
-	}
-
-	redisOpts.ClientName = "dbot"
-
-	rdb := redis.NewClient(redisOpts)
-	defer rdb.Close()
-
-	log.Println("Redis connected, listening for Discord link events...")
+	log.Println("Listening for Discord link events...")
 
 	for {
-		result, err := rdb.BRPop(ctx, 0, "new_discord_user", "remove_discord_user", "config_update").Result()
+		if instance == nil || instance.client == nil {
+			log.Println("Redis queue aborted due to no Redis connection")
+			return
+		}
+
+		result, err := instance.client.BRPop(instance.ctx, 0, "new_discord_user", "remove_discord_user", "config_update").Result()
 		if err != nil {
 			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 				log.Println("Redis queue stopped, context closed")
@@ -112,7 +174,11 @@ func StartRedisQueue(ctx context.Context, s *discordgo.Session) {
 			} else {
 				log.Printf("Joined %s to the guild!\n", user.ID)
 			}
-		} else if queueName == "remove_discord_user" {
+
+			continue
+		}
+
+		if queueName == "remove_discord_user" {
 			if err != nil {
 				// User is not in guild.
 				log.Printf("Skipping remove 'sync' role for %s: Not in guild.", user.ID)
