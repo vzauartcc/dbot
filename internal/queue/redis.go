@@ -107,7 +107,7 @@ func StartRedisQueue(s *discordgo.Session) {
 			return
 		}
 
-		result, err := instance.client.BRPop(instance.ctx, 0, "new_discord_user", "remove_discord_user", "config_update").Result()
+		result, err := instance.client.BRPop(instance.ctx, 0, "new_discord_user", "remove_discord_user", "update_user", "config_update").Result()
 		if err != nil {
 			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 				log.Println("Redis queue stopped, context closed")
@@ -139,8 +139,40 @@ func StartRedisQueue(s *discordgo.Session) {
 			continue
 		}
 
+		cfg, ok := models.GetConfig(mainGuild)
+		if !ok {
+			continue
+		}
+
 		log.Printf("Received Discord link event: %s\n", result[1])
 
+		// User updated by staff or roster-sync.
+		if queueName == "update_user" {
+			var user models.User
+
+			err = json.Unmarshal([]byte(result[1]), &user)
+			if err != nil {
+				log.Printf("Error unmarshaling JSON data for queue: %v\n", err)
+				continue
+			}
+
+			member, err := helpers.GuildMember(s, mainGuild, user.DiscordID)
+			if err != nil {
+				log.Printf("[Redis Role Sync] Error getting member for %s: %v\n", user.DiscordID, err)
+				continue
+			}
+
+			rolesToGive := helpers.RolesToAdd(cfg, user)
+
+			errs := helpers.ExchangeRoles(s, member, cfg, rolesToGive, "Redis Role Sync")
+			if len(errs) != 0 {
+				log.Printf("Error processing Redis Role Sync for %s: %v\n", user.DiscordID, errs)
+			}
+
+			continue
+		}
+
+		// Link/unlink event.
 		var user UserData
 
 		err = json.Unmarshal([]byte(result[1]), &user)
@@ -185,11 +217,6 @@ func StartRedisQueue(s *discordgo.Session) {
 				continue
 			}
 
-			cfg, ok := models.GetConfig(mainGuild)
-			if !ok {
-				continue
-			}
-
 			for _, role := range cfg.GetManagedRoles() {
 				if role.LookupKey == "sync" {
 					err = helpers.GuildMemberRoleRemove(s, mainGuild, user.ID, role.RoleID)
@@ -202,5 +229,7 @@ func StartRedisQueue(s *discordgo.Session) {
 				}
 			}
 		}
+
+		log.Printf("Unknown queue name: %s\n", queueName)
 	}
 }
