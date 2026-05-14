@@ -11,7 +11,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/bot"
-	"github.com/vzauartcc/dbot/internal/queue"
+	"github.com/vzauartcc/dbot/internal/cache"
 	"github.com/vzauartcc/dbot/internal/tasks"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
@@ -90,11 +90,11 @@ func main() {
 
 	bot.RegisterCommands(s)
 
-	err = queue.ConnectRedis(ctx)
+	err = cache.ConnectRedis(ctx)
 	if err != nil {
 		log.Printf("Error connecting to Redis: %v\n", err)
 	} else {
-		go queue.StartRedisQueue(s)
+		go cache.StartRedisQueue(s)
 	}
 
 	runner := tasks.SetupTasks(s)
@@ -113,7 +113,7 @@ func main() {
 
 	log.Println("Shutting down...")
 
-	queue.DisconnectRedis()
+	cache.DisconnectRedis()
 
 	err = bot.UnregisterCommands(s)
 	if err != nil {

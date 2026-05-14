@@ -7,7 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/vzauartcc/dbot/internal/api/models"
-	"github.com/vzauartcc/dbot/internal/queue"
+	"github.com/vzauartcc/dbot/internal/cache"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
@@ -89,7 +89,7 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 		reminderMessages = make(map[string]string)
 	}
 
-	msgID, err := queue.GetReminderMessage(message.ChannelID)
+	msgID, err := cache.GetReminderMessage(message.ChannelID)
 	if err != nil {
 		log.Printf("Error getting reminder message from redis for %s: %v\n", message.ChannelID, err)
 
@@ -137,7 +137,7 @@ func sendMessage(s *discordgo.Session, channelID, content string) {
 
 	reminderMessages[msg.ChannelID] = msg.ID
 
-	err = queue.SetReminderMessage(channelID, msg.ID)
+	err = cache.SetReminderMessage(channelID, msg.ID)
 	if err != nil {
 		log.Printf("Error setting reminder message in redis for %s: %v\n", channelID, err)
 	}
