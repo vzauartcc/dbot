@@ -107,7 +107,7 @@ func StartRedisQueue(s *discordgo.Session) {
 			return
 		}
 
-		result, err := instance.client.BRPop(instance.ctx, 0, "new_discord_user", "remove_discord_user", "update_user", "config_update").Result()
+		result, err := instance.client.BRPop(instance.ctx, 0, "dbot:new_discord_user", "dbot:remove_discord_user", "dbot:update_user", "dbot:config_update").Result()
 		if err != nil {
 			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 				log.Println("Redis queue stopped, context closed")
@@ -121,7 +121,7 @@ func StartRedisQueue(s *discordgo.Session) {
 
 		queueName := result[0]
 
-		if queueName == "config_update" {
+		if queueName == "dbot:config_update" {
 			log.Println("Received config update event, reloading...")
 
 			cfgs, err := zauapi.GetClient().GetConfigs()
@@ -147,7 +147,7 @@ func StartRedisQueue(s *discordgo.Session) {
 		log.Printf("Received Discord link event: %s\n", result[1])
 
 		// User updated by staff or roster-sync.
-		if queueName == "update_user" {
+		if queueName == "dbot:update_user" {
 			var user models.User
 
 			err = json.Unmarshal([]byte(result[1]), &user)
@@ -183,7 +183,7 @@ func StartRedisQueue(s *discordgo.Session) {
 
 		member, err := helpers.GuildMember(s, mainGuild, user.ID)
 
-		if queueName == "new_discord_user" {
+		if queueName == "dbot:new_discord_user" {
 			// User is already a member.
 			if err == nil {
 				log.Printf(
@@ -210,7 +210,7 @@ func StartRedisQueue(s *discordgo.Session) {
 			continue
 		}
 
-		if queueName == "remove_discord_user" {
+		if queueName == "dbot:remove_discord_user" {
 			if err != nil {
 				// User is not in guild.
 				log.Printf("Skipping remove 'sync' role for %s: Not in guild.", user.ID)
