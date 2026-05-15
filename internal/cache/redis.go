@@ -156,6 +156,10 @@ func StartRedisQueue(s *discordgo.Session) {
 				continue
 			}
 
+			if strings.TrimSpace(user.DiscordID) == "" {
+				continue
+			}
+
 			member, err := helpers.GuildMember(s, mainGuild, user.DiscordID)
 			if err != nil {
 				log.Printf("[Redis Role Sync] Error getting member for %s: %v\n", user.DiscordID, err)
@@ -178,6 +182,11 @@ func StartRedisQueue(s *discordgo.Session) {
 		err = json.Unmarshal([]byte(result[1]), &user)
 		if err != nil {
 			log.Printf("Error unmarshaling JSON data for queue: %v\n", err)
+			continue
+		}
+
+		if strings.TrimSpace(user.ID) == "" {
+			log.Printf("Skipping %s due to no Discord ID\n", queueName)
 			continue
 		}
 
