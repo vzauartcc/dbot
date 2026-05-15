@@ -7,6 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	"github.com/vzauartcc/dbot/internal/cache"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
@@ -88,14 +89,21 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 		reminderMessages = make(map[string]string)
 	}
 
-	if reminderMessages[message.ChannelID] == "" {
-		log.Printf("No existing reminder message in %s, creating\n", message.ChannelID)
-		sendMessage(s, message.ChannelID, content)
+	msgID, err := cache.GetReminderMessage(message.ChannelID)
+	if err != nil {
+		log.Printf("Error getting reminder message from redis for %s: %v\n", message.ChannelID, err)
 
-		return
+		if reminderMessages[message.ChannelID] == "" {
+			log.Printf("No existing reminder message in %s, creating\n", message.ChannelID)
+			sendMessage(s, message.ChannelID, content)
+
+			return
+		}
+
+		msgID = reminderMessages[message.ChannelID]
 	}
 
-	oldReminderMessage, err := helpers.ChannelMessage(s, message.ChannelID, reminderMessages[message.ChannelID])
+	oldReminderMessage, err := helpers.ChannelMessage(s, message.ChannelID, msgID)
 	if err != nil {
 		log.Printf(
 			"Error getting existing reminder message in %s. Sending a new one. %v\n",
@@ -128,4 +136,9 @@ func sendMessage(s *discordgo.Session, channelID, content string) {
 	}
 
 	reminderMessages[msg.ChannelID] = msg.ID
+
+	err = cache.SetReminderMessage(channelID, msg.ID)
+	if err != nil {
+		log.Printf("Error setting reminder message in redis for %s: %v\n", channelID, err)
+	}
 }
