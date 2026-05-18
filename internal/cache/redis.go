@@ -9,6 +9,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/api/models"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
@@ -41,6 +42,9 @@ func ConnectRedis(ctx context.Context) error {
 	}
 
 	redisOpts.ClientName = "dbot"
+	redisOpts.MaintNotificationsConfig = &maintnotifications.Config{
+		Mode: maintnotifications.ModeDisabled,
+	}
 
 	instance = &Instance{
 		client: redis.NewClient(redisOpts),
