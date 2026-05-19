@@ -8,13 +8,14 @@ import (
 )
 
 type Config struct {
-	GuildID           string            `json:"id"`
-	RepostChannels    map[string]string `json:"repostChannels"`
-	CleanupChannels   map[string]string `json:"cleanupChannels"`
-	IronMicConfig     UpdateableMessage `json:"ironMic"`
-	OnlineControllers UpdateableMessage `json:"onlineControllers"`
-	ManagedRoles      []ManagedRole     `json:"managedRoles"`
-	ReminderChannels  map[string]string `json:"reminderChannels"`
+	GuildID           string              `json:"id"`
+	RepostChannels    map[string]string   `json:"repostChannels"`
+	CleanupChannels   map[string]string   `json:"cleanupChannels"`
+	IronMicConfig     UpdateableMessage   `json:"ironMic"`
+	OnlineControllers UpdateableMessage   `json:"onlineControllers"`
+	ManagedRoles      []ManagedRole       `json:"managedRoles"`
+	ReminderChannels  map[string]string   `json:"reminderChannels"`
+	RoleGrants        map[string][]string `json:"roleGrants"`
 }
 
 type UpdateableMessage struct {
@@ -128,6 +129,10 @@ func (c *Config) SetOnlineMessage(messageID string, api ConfigUpdater) {
 	c.updateConfig(api)
 
 	log.Printf("Updated Online Controllers message from %s to %s\n", old, messageID)
+}
+
+func (c *Config) GetRoleGrants() map[string][]string {
+	return c.RoleGrants
 }
 
 func (c *Config) updateConfig(service ConfigUpdater) {

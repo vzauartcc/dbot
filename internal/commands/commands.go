@@ -10,6 +10,7 @@ var AllCommands = []*discordgo.ApplicationCommand{
 	GetRoles,
 	GiveRoles,
 	Staff,
+	GrantRole,
 }
 
 var CommandHandlers = map[string]HandlerFunc{
@@ -18,6 +19,7 @@ var CommandHandlers = map[string]HandlerFunc{
 	"getroles":  GetRolesHandler,
 	"giveroles": GetRolesHandler,
 	"staff":     StaffHandler,
+	"grantrole": GrantRoleHandler,
 }
 
 func int64Ptr(v int64) *int64 { return &v }

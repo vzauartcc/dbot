@@ -11,4 +11,8 @@ func HandleInteractions(
 	if i.Type == discordgo.InteractionApplicationCommand {
 		handleApplicationCommands(s, i)
 	}
+
+	if i.Type == discordgo.InteractionMessageComponent {
+		handleMessageComponents(s, i)
+	}
 }
