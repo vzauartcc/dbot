@@ -148,3 +148,57 @@ func TestTitleCase(t *testing.T) {
 		})
 	}
 }
+
+func TestIsValidSnowflake(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected bool
+	}{
+		{
+			name:     "Valid modern snowflake",
+			input:    "116401352477322446",
+			expected: true,
+		},
+		{
+			name:     "Valid older/shorter snowflake",
+			input:    "17592884729921536",
+			expected: true,
+		},
+		{
+			name:     "Invalid: Contains letters",
+			input:    "116401352477a322446",
+			expected: false,
+		},
+		{
+			name:     "Invalid: Completely alphanumeric",
+			input:    "not-a-snowflake",
+			expected: false,
+		},
+		{
+			name:     "Invalid: Empty string",
+			input:    "",
+			expected: false,
+		},
+		{
+			name:     "Invalid: Way too small (Below Discord Epoch)",
+			input:    "123",
+			expected: false,
+		},
+		{
+			name:     "Invalid: Overflow uint64 max value",
+			input:    "18446744073709551616",
+			expected: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := IsSnowflake(tc.input)
+
+			if actual != tc.expected {
+				t.Errorf("IsSnowflake(%q) = %v; want %v", tc.input, actual, tc.expected)
+			}
+		})
+	}
+}

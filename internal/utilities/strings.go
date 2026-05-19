@@ -2,12 +2,18 @@ package helpers
 
 import (
 	"slices"
+	"strconv"
 	"strings"
+	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 var notCapitalized = []string{"a", "and", "as", "at", "but", "by", "down", "for", "from", "if", "in", "into", "like", "near", "nor", "of", "off", "on", "once", "onto", "or", "over", "past", "so", "than", "that", "the", "to", "upon", "when", "with", "yet"}
+
+var discordEpoch = time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC)
 
 func CapitalizeFirst(s string) string {
 	if s == "" {
@@ -36,4 +42,18 @@ func TitleCase(s string) string {
 	}
 
 	return strings.Join(words, " ")
+}
+
+func IsSnowflake(s string) bool {
+	_, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return false
+	}
+
+	timestamp, err := discordgo.SnowflakeTimestamp(s)
+	if err != nil {
+		return false
+	}
+
+	return timestamp.After(discordEpoch)
 }
