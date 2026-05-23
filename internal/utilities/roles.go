@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"slices"
@@ -11,21 +12,24 @@ import (
 	"github.com/vzauartcc/dbot/internal/api/models"
 )
 
-var ratingsToString = []string{
-	"SUS",
-	"OBS",
-	"S1",
-	"S2",
-	"S3",
-	"C1",
-	"C2",
-	"C3",
-	"I1",
-	"I2",
-	"I3",
-	"SUP",
-	"ADM",
-}
+var (
+	ratingsToString = []string{
+		"SUS",
+		"OBS",
+		"S1",
+		"S2",
+		"S3",
+		"C1",
+		"C2",
+		"C3",
+		"I1",
+		"I2",
+		"I3",
+		"SUP",
+		"ADM",
+	}
+	ErrInvalidGuildID = errors.New("invalid guild id")
+)
 
 func RolesToAdd(cfg *models.Config, user models.User) []string {
 	rolesToGive := make([]string, 0)
@@ -106,6 +110,10 @@ func ExchangeRoles(
 	rolesToGive []string,
 	reason string,
 ) []error {
+	if strings.TrimSpace(member.GuildID) == "" || !IsSnowflake(member.GuildID) {
+		return []error{ErrInvalidGuildID}
+	}
+
 	rolesToAdd, rolesToRemove := calculateRoles(cfg, member.Roles, rolesToGive)
 
 	errors := make([]error, 0)

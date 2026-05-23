@@ -148,8 +148,6 @@ func StartRedisQueue(s *discordgo.Session) {
 			continue
 		}
 
-		log.Printf("Received Discord link event: %s\n", result[1])
-
 		// User updated by staff or roster-sync.
 		if queueName == "dbot:update_user" {
 			var user models.User
@@ -163,6 +161,8 @@ func StartRedisQueue(s *discordgo.Session) {
 			if strings.TrimSpace(user.DiscordID) == "" {
 				continue
 			}
+
+			log.Printf("Processing user update for %s %s (%s)\n", user.FirstName, user.LastName, user.DiscordID)
 
 			member, err := helpers.GuildMember(s, mainGuild, user.DiscordID)
 			if err != nil {
