@@ -29,6 +29,8 @@ var (
 		"ADM",
 	}
 	ErrInvalidGuildID = errors.New("invalid guild id")
+	ErrNoChanges      = errors.New("no roles to give or remove")
+	ErrNoData         = errors.New("no roles found on member")
 )
 
 func RolesToAdd(cfg *models.Config, user models.User) []string {
@@ -114,13 +116,17 @@ func ExchangeRoles(
 		return []error{ErrInvalidGuildID}
 	}
 
+	if len(member.Roles) == 0 {
+		return []error{ErrNoData}
+	}
+
 	rolesToAdd, rolesToRemove := calculateRoles(cfg, member.Roles, rolesToGive)
 
-	errors := make([]error, 0)
-
 	if len(rolesToAdd) == 0 && len(rolesToRemove) == 0 {
-		return errors
+		return []error{ErrNoChanges}
 	}
+
+	errors := make([]error, 0)
 
 	log.Printf(
 		"Role exchange report for %s\n\tAdd: %s\n\tDel: %s\n",
