@@ -71,7 +71,7 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	errs := helpers.ExchangeRoles(s, i.Member, cfg, rolesToGive, "/getroles Command")
 	if len(errs) != 0 {
-		log.Printf("Error processing /getroles for %s: %v\n", i.User.ID, errs)
+		log.Printf("Error processing /getroles for %s: %v\n", i.Member.User.ID, errs)
 
 		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "Error updating your roles.",
