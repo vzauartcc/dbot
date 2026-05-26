@@ -38,7 +38,7 @@ func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
 
 func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate, title string) {
 	avatarURL := message.Author.AvatarURL("")
-	if message.Member != nil && message.Member.Avatar != "" {
+	if message.Member != nil && message.Member.Avatar != "" && message.Member.User != nil {
 		avatarURL = message.Member.AvatarURL("")
 	}
 

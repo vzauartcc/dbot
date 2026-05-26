@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"errors"
 	"log"
 	"slices"
 	"strings"
@@ -61,11 +62,13 @@ func (m *Manager) AutoGiveRoles() {
 
 		errs := helpers.ExchangeRoles(m.Session, member, cfg, rolesToAdd, "Scheduled Role Sync")
 		for _, err := range errs {
-			log.Printf(
-				"[AutoRoles] Error syncing role for %s: %v\n",
-				helpers.GetMemberName(member),
-				err,
-			)
+			if !errors.Is(err, helpers.ErrNoChanges) {
+				log.Printf(
+					"[AutoRoles] Error syncing roles for %s: %v\n",
+					helpers.GetMemberName(member),
+					err,
+				)
+			}
 		}
 
 		err = helpers.SetNickname(m.Session, member, user)
