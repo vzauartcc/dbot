@@ -190,6 +190,11 @@ func TestIsValidSnowflake(t *testing.T) {
 			input:    "18446744073709551616",
 			expected: false,
 		},
+		{
+			name:     "Valid GuildID",
+			input:    "485491681903247361",
+			expected: true,
+		},
 	}
 
 	for _, tc := range tests {

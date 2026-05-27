@@ -112,10 +112,6 @@ func ExchangeRoles(
 	rolesToGive []string,
 	reason string,
 ) []error {
-	if strings.TrimSpace(member.GuildID) == "" || !IsSnowflake(member.GuildID) {
-		return []error{ErrInvalidGuildID}
-	}
-
 	rolesToAdd, rolesToRemove := calculateRoles(cfg, member.Roles, rolesToGive)
 
 	if len(rolesToAdd) == 0 && len(rolesToRemove) == 0 {
@@ -138,7 +134,7 @@ func ExchangeRoles(
 			continue
 		}
 
-		err := GuildMemberRoleAdd(s, member.GuildID, member.User.ID, toAdd)
+		err := GuildMemberRoleAdd(s, cfg.GuildID, member.User.ID, toAdd)
 		if err != nil {
 			errors = append(errors, fmt.Errorf("error giving role %s: %w", toAdd, err))
 		} else {
@@ -153,7 +149,7 @@ func ExchangeRoles(
 			continue
 		}
 
-		err := GuildMemberRoleRemove(s, member.GuildID, member.User.ID, toRemove)
+		err := GuildMemberRoleRemove(s, cfg.GuildID, member.User.ID, toRemove)
 		if err != nil {
 			errors = append(errors, fmt.Errorf("error revoking role %s: %w", toRemove, err))
 		} else {
@@ -166,7 +162,7 @@ func ExchangeRoles(
 		msg = "Partial Role Change Report (Error giving or taking roles):\n\n"
 	}
 
-	allRoles, err := GuildRoles(s, member.GuildID)
+	allRoles, err := GuildRoles(s, cfg.GuildID)
 	if err != nil {
 		log.Printf("Error getting roles for role report: %v\n", err)
 		return errors
