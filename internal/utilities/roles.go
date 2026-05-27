@@ -116,10 +116,6 @@ func ExchangeRoles(
 		return []error{ErrInvalidGuildID}
 	}
 
-	if len(member.Roles) == 0 {
-		return []error{ErrNoData}
-	}
-
 	rolesToAdd, rolesToRemove := calculateRoles(cfg, member.Roles, rolesToGive)
 
 	if len(rolesToAdd) == 0 && len(rolesToRemove) == 0 {
