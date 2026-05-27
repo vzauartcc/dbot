@@ -17,7 +17,7 @@ var Staff = &discordgo.ApplicationCommand{
 }
 
 func StaffHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	if !helpers.SendThinking(s, i, "staff") {
+	if !helpers.SendThinking(s, i, "staff", true) {
 		return
 	}
 

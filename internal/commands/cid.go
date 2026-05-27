@@ -24,7 +24,7 @@ var CID = &discordgo.ApplicationCommand{
 }
 
 func CidHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	if !helpers.SendThinking(s, i, "cid") {
+	if !helpers.SendThinking(s, i, "cid", true) {
 		return
 	}
 
