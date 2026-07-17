@@ -99,6 +99,7 @@ func generateJWT() string {
 	signer, err := jwt.NewSignerHS(jwt.HS256, key)
 	if err != nil {
 		log.Printf("Error generate JWT: %v\n", err)
+
 		return ""
 	}
 
@@ -112,6 +113,7 @@ func generateJWT() string {
 	token, err := builder.Build(claims)
 	if err != nil {
 		log.Printf("Error signing JWT: %v\n", err)
+
 		return ""
 	}
 

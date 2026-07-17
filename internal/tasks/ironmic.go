@@ -18,6 +18,7 @@ func (m *Manager) UpdateIronMic() {
 	data, err := zauapi.GetClient().GetIronMic()
 	if err != nil {
 		log.Printf("Error update Iron Mic message: %v\n", err)
+
 		return
 	}
 

@@ -122,7 +122,11 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 
 		sendMessage(s, message.ChannelID, content)
 	} else {
-		log.Printf("Reminder message in %s is less than 90 seconds old: %v\n", message.ChannelID, time.Since(oldReminderMessage.Timestamp))
+		log.Printf(
+			"Reminder message in %s is less than 90 seconds old: %v\n",
+			message.ChannelID,
+			time.Since(oldReminderMessage.Timestamp),
+		)
 	}
 }
 
@@ -130,6 +134,7 @@ func sendMessage(s *discordgo.Session, channelID, content string) {
 	msg, err := helpers.ChannelMessageSend(s, channelID, content)
 	if err != nil {
 		log.Printf("Error sending reminder message in %s: %v\n", channelID, err)
+
 		return
 	}
 

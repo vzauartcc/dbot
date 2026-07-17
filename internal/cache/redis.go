@@ -100,6 +100,7 @@ func StartRedisQueue(s *discordgo.Session) {
 	mainGuild := helpers.GetMainDiscordServerID()
 	if strings.TrimSpace(mainGuild) == "" {
 		log.Println("Redis queue skipped due to no DISCORD_SERVER_ID")
+
 		return
 	}
 
@@ -108,13 +109,16 @@ func StartRedisQueue(s *discordgo.Session) {
 	for {
 		if instance == nil || instance.client == nil {
 			log.Println("Redis queue aborted due to no Redis connection")
+
 			return
 		}
 
-		result, err := instance.client.BRPop(instance.ctx, 0, "dbot:new_discord_user", "dbot:remove_discord_user", "dbot:update_user", "dbot:config_update").Result()
+		result, err := instance.client.BRPop(instance.ctx, 0, "dbot:new_discord_user", "dbot:remove_discord_user", "dbot:update_user", "dbot:config_update").
+			Result()
 		if err != nil {
 			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 				log.Println("Redis queue stopped, context closed")
+
 				return
 			}
 
@@ -131,6 +135,7 @@ func StartRedisQueue(s *discordgo.Session) {
 			cfgs, err := zauapi.GetClient().GetConfigs()
 			if err != nil {
 				log.Printf("Error getting bot configurations: %v\n", err)
+
 				return
 			}
 
@@ -155,6 +160,7 @@ func StartRedisQueue(s *discordgo.Session) {
 			err = json.Unmarshal([]byte(result[1]), &user)
 			if err != nil {
 				log.Printf("Error unmarshaling JSON data for queue: %v\n", err)
+
 				continue
 			}
 
@@ -162,11 +168,21 @@ func StartRedisQueue(s *discordgo.Session) {
 				continue
 			}
 
-			log.Printf("Processing user update for %s %s (%s)\n", user.FirstName, user.LastName, user.DiscordID)
+			log.Printf(
+				"Processing user update for %s %s (%s)\n",
+				user.FirstName,
+				user.LastName,
+				user.DiscordID,
+			)
 
 			member, err := helpers.GuildMember(s, mainGuild, user.DiscordID)
 			if err != nil {
-				log.Printf("[Redis Role Sync] Error getting member for %s: %v\n", user.DiscordID, err)
+				log.Printf(
+					"[Redis Role Sync] Error getting member for %s: %v\n",
+					user.DiscordID,
+					err,
+				)
+
 				continue
 			}
 
@@ -186,11 +202,13 @@ func StartRedisQueue(s *discordgo.Session) {
 		err = json.Unmarshal([]byte(result[1]), &user)
 		if err != nil {
 			log.Printf("Error unmarshaling JSON data for queue: %v\n", err)
+
 			continue
 		}
 
 		if strings.TrimSpace(user.ID) == "" {
 			log.Printf("Skipping %s due to no Discord ID\n", queueName)
+
 			continue
 		}
 
@@ -227,6 +245,7 @@ func StartRedisQueue(s *discordgo.Session) {
 			if err != nil {
 				// User is not in guild.
 				log.Printf("Skipping remove 'sync' role for %s: Not in guild.", user.ID)
+
 				continue
 			}
 

@@ -16,6 +16,7 @@ func (m *Manager) AutoGiveRoles() {
 	cfg, ok := models.GetConfig(helpers.GetMainDiscordServerID())
 	if !ok {
 		log.Println("[AutoRoles] Skipping AutoGiveRoles due to no config")
+
 		return
 	}
 
@@ -24,6 +25,7 @@ func (m *Manager) AutoGiveRoles() {
 	for _, role := range cfg.ManagedRoles {
 		if role.LookupKey == "sync" {
 			syncRole = role.RoleID
+
 			break
 		}
 	}
@@ -31,6 +33,7 @@ func (m *Manager) AutoGiveRoles() {
 	users, err := zauapi.GetClient().GetUsers()
 	if err != nil {
 		log.Printf("[AutoRoles] Error getting linked accounts for AutoGiveRoles task: %v\n", err)
+
 		return
 	}
 
@@ -47,7 +50,8 @@ func (m *Manager) AutoGiveRoles() {
 	for _, member := range members {
 		membersByID[member.User.ID] = member
 
-		if syncRole != "" && !slices.Contains(userIDs, member.User.ID) && slices.Contains(member.Roles, syncRole) {
+		if syncRole != "" && !slices.Contains(userIDs, member.User.ID) &&
+			slices.Contains(member.Roles, syncRole) {
 			toRemove = append(toRemove, member)
 		}
 	}
@@ -82,9 +86,18 @@ func (m *Manager) AutoGiveRoles() {
 	}
 
 	for _, toRemove := range toRemove {
-		err := helpers.GuildMemberRoleRemove(m.Session, toRemove.GuildID, toRemove.User.ID, syncRole)
+		err := helpers.GuildMemberRoleRemove(
+			m.Session,
+			toRemove.GuildID,
+			toRemove.User.ID,
+			syncRole,
+		)
 		if err != nil {
-			log.Printf("[AutoRoles] Error removing sync role from %s: %v\n", helpers.GetMemberName(toRemove), err)
+			log.Printf(
+				"[AutoRoles] Error removing sync role from %s: %v\n",
+				helpers.GetMemberName(toRemove),
+				err,
+			)
 		}
 	}
 }
@@ -95,23 +108,26 @@ func (m *Manager) FetchGuildMembers(guildID string) []*discordgo.Member {
 	stop := make(chan struct{})
 	nonce := "fetch-members-" + guildID
 
-	removeHandler := m.Session.AddHandler(func(_ *discordgo.Session, chunk *discordgo.GuildMembersChunk) {
-		if chunk.Nonce != nonce {
-			return
-		}
+	removeHandler := m.Session.AddHandler(
+		func(_ *discordgo.Session, chunk *discordgo.GuildMembersChunk) {
+			if chunk.Nonce != nonce {
+				return
+			}
 
-		members = append(members, chunk.Members...)
+			members = append(members, chunk.Members...)
 
-		if chunk.ChunkIndex+1 == chunk.ChunkCount {
-			close(stop)
-		}
-	})
+			if chunk.ChunkIndex+1 == chunk.ChunkCount {
+				close(stop)
+			}
+		},
+	)
 
 	defer removeHandler()
 
 	err := helpers.RequestGuildMembers(m.Session, guildID, "", 0, nonce, false)
 	if err != nil {
 		log.Printf("[AutoRoles] Error fetching members: %v\n", err)
+
 		return nil
 	}
 

@@ -11,7 +11,40 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var notCapitalized = []string{"a", "and", "as", "at", "but", "by", "down", "for", "from", "if", "in", "into", "like", "near", "nor", "of", "off", "on", "once", "onto", "or", "over", "past", "so", "than", "that", "the", "to", "upon", "when", "with", "yet"}
+var notCapitalized = []string{
+	"a",
+	"and",
+	"as",
+	"at",
+	"but",
+	"by",
+	"down",
+	"for",
+	"from",
+	"if",
+	"in",
+	"into",
+	"like",
+	"near",
+	"nor",
+	"of",
+	"off",
+	"on",
+	"once",
+	"onto",
+	"or",
+	"over",
+	"past",
+	"so",
+	"than",
+	"that",
+	"the",
+	"to",
+	"upon",
+	"when",
+	"with",
+	"yet",
+}
 
 var discordEpoch = time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC)
 
@@ -30,11 +63,13 @@ func TitleCase(s string) string {
 	for i, word := range words {
 		if i == 0 {
 			words[i] = CapitalizeFirst(word)
+
 			continue
 		}
 
 		if slices.Contains(notCapitalized, strings.ToLower(words[i])) {
 			words[i] = strings.ToLower(words[i])
+
 			continue
 		}
 
