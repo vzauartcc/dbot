@@ -31,6 +31,7 @@ func main() {
 	s, err := discordgo.New("Bot " + helpers.GetBotToken())
 	if err != nil {
 		log.Println("Invalid bot parameters: ", err)
+
 		return
 	}
 
@@ -84,6 +85,7 @@ func main() {
 	err = s.Open()
 	if err != nil {
 		log.Printf("Error opening bot connection: %s\n", err)
+
 		return
 	}
 	defer s.Close()

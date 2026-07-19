@@ -16,6 +16,7 @@ func (m *Manager) UpdateOnlineControllers() {
 	online, err := zauapi.GetClient().GetOnlineATC()
 	if err != nil {
 		log.Printf("Error getting online data: %v\n", err)
+
 		return
 	}
 
@@ -24,8 +25,9 @@ func (m *Manager) UpdateOnlineControllers() {
 	for _, controller := range online.Controllers {
 		fmt.Fprintf(
 			&builder,
-			"- %s - %s\n",
+			"- %s - %s - %s\n",
 			controller.Name,
+			controller.Position,
 			secToTime(int(time.Since(controller.LogonTime).Seconds())),
 		)
 	}
