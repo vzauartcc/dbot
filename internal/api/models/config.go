@@ -134,6 +134,7 @@ func (c *Config) updateConfig(service ConfigUpdater) {
 	_, err := service.UpdateConfig(c.GuildID, c)
 	if err != nil {
 		log.Printf("Error updating config: %v\n", err)
+
 		return
 	}
 

@@ -165,6 +165,7 @@ func ExchangeRoles(
 	allRoles, err := GuildRoles(s, cfg.GuildID)
 	if err != nil {
 		log.Printf("Error getting roles for role report: %v\n", err)
+
 		return errors
 	}
 

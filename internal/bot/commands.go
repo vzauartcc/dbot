@@ -13,6 +13,7 @@ func RegisterCommands(s *discordgo.Session) {
 	guildID := helpers.GetMainDiscordServerID()
 	if strings.TrimSpace(guildID) == "" {
 		log.Println("Skipping command registration due to missing DISCORD_SERVER_ID")
+
 		return
 	}
 

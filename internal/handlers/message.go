@@ -37,6 +37,10 @@ func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
 }
 
 func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate, title string) {
+	if strings.TrimSpace(message.Content) == "" {
+		return
+	}
+
 	avatarURL := message.Author.AvatarURL("")
 	if message.Member != nil && message.Member.Avatar != "" && message.Member.User != nil {
 		avatarURL = message.Member.AvatarURL("")
@@ -58,14 +62,8 @@ func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate,
 		Timestamp: time.Now().Format(time.RFC3339),
 	}
 
-	attachments := make([]string, 0, len(message.Attachments))
-	for _, a := range message.Attachments {
-		attachments = append(attachments, a.URL)
-	}
-
 	_, err := helpers.ChannelMessageSendComplex(s, message.ChannelID, &discordgo.MessageSend{
-		Embeds:  []*discordgo.MessageEmbed{embed},
-		Content: strings.Join(attachments, "\n"),
+		Embeds: []*discordgo.MessageEmbed{embed},
 	})
 	if err != nil {
 		log.Printf("Failed to post embed in repost channel %s: %v\n", message.ChannelID, err)
@@ -124,7 +122,11 @@ func handleReminderChannel(s *discordgo.Session, message *discordgo.MessageCreat
 
 		sendMessage(s, message.ChannelID, content)
 	} else {
-		log.Printf("Reminder message in %s is less than 90 seconds old: %v\n", message.ChannelID, time.Since(oldReminderMessage.Timestamp))
+		log.Printf(
+			"Reminder message in %s is less than 90 seconds old: %v\n",
+			message.ChannelID,
+			time.Since(oldReminderMessage.Timestamp),
+		)
 	}
 }
 
@@ -132,6 +134,7 @@ func sendMessage(s *discordgo.Session, channelID, content string) {
 	msg, err := helpers.ChannelMessageSend(s, channelID, content)
 	if err != nil {
 		log.Printf("Error sending reminder message in %s: %v\n", channelID, err)
+
 		return
 	}
 

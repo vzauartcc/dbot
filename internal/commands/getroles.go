@@ -23,7 +23,7 @@ var GiveRoles = &discordgo.ApplicationCommand{
 }
 
 func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	if !helpers.SendThinking(s, i, "getroles") {
+	if !helpers.SendThinking(s, i, "getroles", false) {
 		return
 	}
 

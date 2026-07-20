@@ -14,7 +14,7 @@ var Ping = &discordgo.ApplicationCommand{
 }
 
 func PingHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	if !helpers.SendThinking(s, i, "ping") {
+	if !helpers.SendThinking(s, i, "ping", true) {
 		return
 	}
 
