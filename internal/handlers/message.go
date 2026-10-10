@@ -34,6 +34,10 @@ func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
 
 		return
 	}
+
+	if message.ChannelID == "544667260980297737" || message.ChannelID == "756596099103457301" {
+		handleAtcsccChannels(s, message)
+	}
 }
 
 func handleRepostChannel(s *discordgo.Session, message *discordgo.MessageCreate, title string) {
@@ -143,5 +147,58 @@ func sendMessage(s *discordgo.Session, channelID, content string) {
 	err = cache.SetReminderMessage(channelID, msg.ID)
 	if err != nil {
 		log.Printf("Error setting reminder message in redis for %s: %v\n", channelID, err)
+	}
+}
+
+var atcsccFacilities = map[string]struct{}{
+	"ZAU": {},
+	"C90": {},
+	"ORD": {},
+	"MDW": {},
+	"CID": {},
+	"CMI": {},
+	"FWA": {},
+	"GRR": {},
+	"MKE": {},
+	"MLI": {},
+	"MSN": {},
+	"PIA": {},
+	"SBN": {},
+	"ARR": {},
+	"AZO": {},
+	"BMI": {},
+	"BTL": {},
+	"DBQ": {},
+	"DEC": {},
+	"DPA": {},
+	"EKM": {},
+	"ENW": {},
+	"GUS": {},
+	"GYY": {},
+	"JVL": {},
+	"LAF": {},
+	"LOT": {},
+	"MKG": {},
+	"MWC": {},
+	"OSH": {},
+	"PWK": {},
+	"RFD": {},
+	"UES": {},
+	"UGN": {},
+	"VOK": {},
+}
+
+func handleAtcsccChannels(s *discordgo.Session, message *discordgo.MessageCreate) {
+	parts := strings.FieldsFunc(message.Content, func(r rune) bool {
+		return r == ' ' || r == ':' || r == '/'
+	})
+
+	for _, word := range parts {
+		if _, ok := atcsccFacilities[word]; ok {
+			// For testing, use my test channel
+			sendMessage(s, "1423816312299196426", message.Content)
+
+			return
+		}
 	}
 }
