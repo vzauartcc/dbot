@@ -18,6 +18,7 @@ var CommandHandlers = map[string]HandlerFunc{
 	"getroles":  GetRolesHandler,
 	"giveroles": GetRolesHandler,
 	"staff":     StaffHandler,
+	"pirep":     PirepHandler,
 }
 
 func int64Ptr(v int64) *int64 { return &v }
