@@ -189,6 +189,8 @@ var atcsccFacilities = map[string]struct{}{
 }
 
 func handleAtcsccChannels(s *discordgo.Session, message *discordgo.MessageCreate) {
+	log.Println("processing ATCSCC message", message.ID)
+
 	parts := strings.FieldsFunc(message.Content, func(r rune) bool {
 		return r == ' ' || r == ':' || r == '/'
 	})
@@ -196,7 +198,7 @@ func handleAtcsccChannels(s *discordgo.Session, message *discordgo.MessageCreate
 	for _, word := range parts {
 		if _, ok := atcsccFacilities[word]; ok {
 			// For testing, use my test channel
-			sendMessage(s, "1423816312299196426", message.Content)
+			helpers.ChannelMessageSend(s, "1423816312299196426", message.Content)
 
 			return
 		}
