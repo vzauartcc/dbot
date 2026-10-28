@@ -196,7 +196,7 @@ func StartRedisQueue(s *discordgo.Session) {
 			continue
 		}
 
-		// Link/unlink event.
+		// Link/unlink events.
 		var user UserData
 
 		err = json.Unmarshal([]byte(result[1]), &user)
@@ -260,6 +260,8 @@ func StartRedisQueue(s *discordgo.Session) {
 					}
 				}
 			}
+
+			continue
 		}
 
 		log.Printf("Unknown queue name: %s\n", queueName)
