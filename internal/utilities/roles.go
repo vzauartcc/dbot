@@ -31,6 +31,7 @@ var (
 	ErrInvalidGuildID = errors.New("invalid guild id")
 	ErrNoChanges      = errors.New("no roles to give or remove")
 	ErrNoData         = errors.New("no roles found on member")
+	ErrNoSync         = errors.New("missing sync role")
 )
 
 func RolesToAdd(cfg *models.Config, user models.User) []string {
@@ -112,6 +113,20 @@ func ExchangeRoles(
 	rolesToGive []string,
 	reason string,
 ) []error {
+	syncRole := "1"
+
+	for _, role := range cfg.GetManagedRoles() {
+		if role.LookupKey == "sync" {
+			syncRole = role.RoleID
+		}
+	}
+
+	if !slices.Contains(member.Roles, syncRole) {
+		log.Printf("Skipping role sync for %s due to missing SYNC role\n", GetMemberName(member))
+
+		return []error{ErrNoSync}
+	}
+
 	rolesToAdd, rolesToRemove := calculateRoles(cfg, member.Roles, rolesToGive)
 
 	if len(rolesToAdd) == 0 && len(rolesToRemove) == 0 {
