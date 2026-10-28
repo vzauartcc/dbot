@@ -198,7 +198,10 @@ func handleAtcsccChannels(s *discordgo.Session, message *discordgo.MessageCreate
 	for _, word := range parts {
 		if _, ok := atcsccFacilities[word]; ok {
 			// For testing, use my test channel
-			helpers.ChannelMessageSend(s, "1423816312299196426", message.Content)
+			_, err := helpers.ChannelMessageSend(s, "1423816312299196426", message.Content)
+			if err != nil {
+				log.Printf("Error reposting ATCSCC message: %v\n", err)
+			}
 
 			return
 		}
