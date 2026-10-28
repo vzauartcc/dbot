@@ -153,6 +153,14 @@ func StartRedisQueue(s *discordgo.Session) {
 			continue
 		}
 
+		var syncRole string
+
+		for _, role := range cfg.GetManagedRoles() {
+			if role.LookupKey == "sync" {
+				syncRole = role.RoleID
+			}
+		}
+
 		// User updated by staff or roster-sync.
 		if queueName == "dbot:update_user" {
 			var user models.User
@@ -230,13 +238,15 @@ func StartRedisQueue(s *discordgo.Session) {
 				Nick:        "",
 				Mute:        false,
 				Deaf:        false,
-				Roles:       nil,
+				Roles:       []string{syncRole},
 			})
 			if err != nil {
 				log.Printf("Error auto-joining %s to guild: %v\n", user.ID, err)
-			} else {
-				log.Printf("Joined %s to the guild!\n", user.ID)
+
+				continue
 			}
+
+			log.Printf("Joined %s to the guild!\n", user.ID)
 
 			continue
 		}
