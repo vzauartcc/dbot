@@ -230,6 +230,14 @@ func StartRedisQueue(s *discordgo.Session) {
 					strings.ReplaceAll(helpers.GetMemberName(member), "\n", ""),
 				)
 
+				err = helpers.GuildMemberRoleAdd(s, cfg.GuildID, user.ID, syncRole, nil)
+				if err != nil {
+					log.Printf(
+						"Error adding sync role during link event to %s",
+						helpers.GetMemberName(member),
+					)
+				}
+
 				continue
 			}
 
