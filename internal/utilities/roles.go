@@ -121,7 +121,7 @@ func ExchangeRoles(
 		}
 	}
 
-	if !slices.Contains(member.Roles, syncRole) {
+	if !slices.Contains(member.Roles, syncRole) && reason != "/getroles Command" {
 		log.Printf("Skipping role sync for %s due to missing SYNC role\n", GetMemberName(member))
 
 		return []error{ErrNoSync}
