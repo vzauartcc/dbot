@@ -3,6 +3,7 @@ package commands
 import (
 	"errors"
 	"log"
+	"slices"
 
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
@@ -71,12 +72,22 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	errs := helpers.ExchangeRoles(s, i.Member, cfg, rolesToGive, "/getroles Command")
 	if len(errs) != 0 {
+		var err error
+
 		log.Printf("Error processing /getroles for %s: %v\n", i.Member.User.ID, errs)
 
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Error updating your roles.",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
+		if slices.Contains(errs, helpers.ErrNoChanges) {
+			_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
+				Content: "Roles synced! (No changes)",
+				Flags:   discordgo.MessageFlagsEphemeral,
+			})
+		} else {
+			_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
+				Content: "Error updating your roles.",
+				Flags:   discordgo.MessageFlagsEphemeral,
+			})
+		}
+
 		if err != nil {
 			log.Printf(
 				"Error sending failure of /getroles for %s: %v\n",
