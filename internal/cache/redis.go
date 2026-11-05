@@ -153,6 +153,14 @@ func StartRedisQueue(s *discordgo.Session) {
 			continue
 		}
 
+		var syncRole string
+
+		for _, role := range cfg.GetManagedRoles() {
+			if role.LookupKey == "sync" {
+				syncRole = role.RoleID
+			}
+		}
+
 		// User updated by staff or roster-sync.
 		if queueName == "dbot:update_user" {
 			var user models.User
@@ -196,7 +204,7 @@ func StartRedisQueue(s *discordgo.Session) {
 			continue
 		}
 
-		// Link/unlink event.
+		// Link/unlink events.
 		var user UserData
 
 		err = json.Unmarshal([]byte(result[1]), &user)
@@ -222,6 +230,14 @@ func StartRedisQueue(s *discordgo.Session) {
 					strings.ReplaceAll(helpers.GetMemberName(member), "\n", ""),
 				)
 
+				err = helpers.GuildMemberRoleAdd(s, cfg.GuildID, user.ID, syncRole, nil)
+				if err != nil {
+					log.Printf(
+						"Error adding sync role during link event to %s",
+						helpers.GetMemberName(member),
+					)
+				}
+
 				continue
 			}
 
@@ -230,13 +246,15 @@ func StartRedisQueue(s *discordgo.Session) {
 				Nick:        "",
 				Mute:        false,
 				Deaf:        false,
-				Roles:       nil,
+				Roles:       []string{syncRole},
 			})
 			if err != nil {
 				log.Printf("Error auto-joining %s to guild: %v\n", user.ID, err)
-			} else {
-				log.Printf("Joined %s to the guild!\n", user.ID)
+
+				continue
 			}
+
+			log.Printf("Joined %s to the guild!\n", user.ID)
 
 			continue
 		}
@@ -260,6 +278,8 @@ func StartRedisQueue(s *discordgo.Session) {
 					}
 				}
 			}
+
+			continue
 		}
 
 		log.Printf("Unknown queue name: %s\n", queueName)

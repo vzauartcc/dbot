@@ -14,7 +14,7 @@ func SetNickname(s *discordgo.Session, member *discordgo.Member, user models.Use
 
 	newNick := calculateNewNickname(user)
 
-	staffRoles := []string{"atm", "datm", "ta", "ec", "fe", "wm"}
+	staffRoles := []string{"atm", "datm", "ta", "ia", "ec", "et", "fe", "ft", "wm", "wt"}
 
 	isStaff := slices.ContainsFunc(user.Roles, func(role string) bool {
 		return slices.Contains(staffRoles, role)
