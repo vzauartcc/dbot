@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -220,4 +222,144 @@ func ExchangeRoles(
 	}
 
 	return errors
+}
+
+var instructorRegex = regexp.MustCompile(`cid:(\d+)\s+id:(\d+)$`)
+
+func ProcessStudentAssignment(
+	s *discordgo.Session,
+	cfg models.Config,
+	studentID string,
+	instructorCID int,
+	added bool,
+) {
+	member, err := GuildMember(s, cfg.GetGuildID(), studentID)
+	if err != nil {
+		log.Printf("Error getting student: %v\n", err)
+
+		return
+	}
+
+	if member == nil {
+		log.Println("Student not found")
+
+		return
+	}
+
+	allRoles, err := s.GuildRoles(cfg.GetGuildID())
+	if err != nil {
+		log.Printf("Error getting guild roles: %v\n", err)
+
+		return
+	}
+
+	addConfirmed := false
+	matched := false
+
+	for _, role := range allRoles {
+		if role.Name == "In Training" {
+			if added {
+				err = GuildMemberRoleAdd(s, cfg.GetGuildID(), studentID, role.ID)
+				if err != nil {
+					log.Printf(
+						"Error adding 'In Training' role to %s: %v\n",
+						GetMemberName(member),
+						err,
+					)
+				}
+			} else {
+				err = GuildMemberRoleRemove(s, cfg.GetGuildID(), studentID, role.ID)
+				if err != nil {
+					log.Printf(
+						"Error removing 'In Training' role from %s: %v\n",
+						GetMemberName(member),
+						err,
+					)
+				}
+			}
+
+			continue
+		}
+
+		// Check to see if the role is the instructor's channel role.
+		if !strings.HasSuffix(role.Name, fmt.Sprintf("Student (%d)", instructorCID)) {
+			continue
+		}
+
+		matched = true
+
+		// Student needs to be added to the instructor's role.
+		if added {
+			if slices.Contains(member.Roles, role.ID) {
+				log.Printf("%s already has %s\n", GetMemberName(member), role.Name)
+
+				continue
+			}
+
+			err = GuildMemberRoleAdd(s, cfg.GetGuildID(), studentID, role.ID)
+			if err != nil {
+				log.Printf("Error adding student role to %s: %v\n", GetMemberName(member), err)
+
+				continue
+			}
+
+			log.Printf("Added %s role to %s\n", role.Name, GetMemberName(member))
+
+			addConfirmed = true
+
+			continue
+		}
+
+		if !slices.Contains(member.Roles, role.ID) {
+			log.Printf("No student role to remove for %s\n", GetMemberName(member))
+
+			continue
+		}
+
+		err = GuildMemberRoleRemove(s, cfg.GetGuildID(), studentID, role.ID)
+		if err != nil {
+			log.Printf("Error removing %s from %s: %v\n", role.Name, GetMemberName(member), err)
+		}
+
+		continue
+	}
+
+	if !matched {
+		log.Printf("Did not find role to modify on student %s\n", GetMemberName(member))
+	}
+
+	if !addConfirmed {
+		return
+	}
+
+	channels, err := s.GuildChannels(cfg.GetGuildID())
+	if err != nil {
+		log.Printf("Error getting guild channels: %v\n", err)
+
+		return
+	}
+
+	for _, channel := range channels {
+		matches := instructorRegex.FindStringSubmatch(channel.Topic)
+
+		if len(matches) < 3 || strconv.Itoa(instructorCID) != matches[1] {
+			continue
+		}
+
+		_, err = ChannelMessageSendComplex(s, channel.ID, &discordgo.MessageSend{
+			Content: fmt.Sprintf(
+				"<@%s> Welcome to <#%s>! Feel free to post your availability and coordinate training sessions with <@%s> in this channel."+
+					"\n\nAs a reminder, you must complete two (2) training sessions per calendar month to remain in the training program. "+
+					"The training requirement does not apply to you for this current month."+
+					"\n\n**Please post your availability within the next 48 hours.** "+
+					"Otherwise your training spot may be given to the next person in line.",
+				studentID,
+				channel.ID,
+				matches[2],
+			),
+		})
+		if err != nil {
+			log.Printf("Error sending welcome message for %s: %v\n", GetMemberName(member), err)
+		}
+	}
 }
