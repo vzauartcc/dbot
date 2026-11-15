@@ -79,7 +79,7 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 
 	targetUser := userOption.UserValue(s)
 
-	targetInsructor, err := helpers.GuildMember(s, i.GuildID, targetUser.ID)
+	targetInstructor, err := helpers.GuildMember(s, i.GuildID, targetUser.ID)
 	if err != nil {
 		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "Unable to retrieve member.",
@@ -150,6 +150,7 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 
 	instructorCID := inputCID.IntValue()
 
+	// Founder CIDs start at 800001, not possible to be less than a founder.
 	if instructorCID < 800000 {
 		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "Invalid CID",
@@ -166,7 +167,7 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 		return
 	}
 
-	instructorName := strings.Fields(strings.Split(targetInsructor.Nick, "|")[0])
+	instructorName := strings.Fields(strings.Split(targetInstructor.Nick, "|")[0])
 
 	if len(instructorName) < 2 {
 		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
@@ -190,7 +191,11 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 		Mentionable: new(true),
 	})
 	if err != nil {
-		log.Printf("Error creating instructor student role for %s: %v\n", targetInsructor.Nick, err)
+		log.Printf(
+			"Error creating instructor student role for %s: %v\n",
+			targetInstructor.Nick,
+			err,
+		)
 
 		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
 			Content: "Error creating instructor role",
@@ -210,7 +215,7 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 	createdChannel := createChannel(
 		s,
 		i,
-		targetInsructor,
+		targetInstructor,
 		createdRole,
 		instructorCID,
 		instructorName,
@@ -264,7 +269,7 @@ func createChannel(
 			// Gets past most of the announcment and other channels.
 			Position: 13,
 			PermissionOverwrites: []*discordgo.PermissionOverwrite{
-				// Deny @everyone.
+				// Deny @everyone, which uses the guild ID for the role ID.
 				{
 					ID:    i.GuildID,
 					Type:  discordgo.PermissionOverwriteTypeRole,

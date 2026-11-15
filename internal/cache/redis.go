@@ -97,8 +97,7 @@ func SetReminderMessage(channelID string, messageID string) error {
 }
 
 func StartRedisQueue(s *discordgo.Session) {
-	mainGuild := helpers.GetMainDiscordServerID()
-	if strings.TrimSpace(mainGuild) == "" {
+	if strings.TrimSpace(helpers.GetMainDiscordServerID()) == "" {
 		log.Println("Redis queue skipped due to no DISCORD_SERVER_ID")
 
 		return

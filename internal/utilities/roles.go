@@ -224,8 +224,6 @@ func ExchangeRoles(
 	return errors
 }
 
-var instructorRegex = regexp.MustCompile(`cid:(\d+)\s+id:(\d+)$`)
-
 func ProcessStudentAssignment(
 	s *discordgo.Session,
 	cfg models.Config,
@@ -233,6 +231,8 @@ func ProcessStudentAssignment(
 	instructorCID int,
 	added bool,
 ) {
+	instructorRegex := regexp.MustCompile(`cid:(\d+)\s+id:(\d+)$`)
+
 	member, err := GuildMember(s, cfg.GetGuildID(), studentID)
 	if err != nil {
 		log.Printf("Error getting student: %v\n", err)
