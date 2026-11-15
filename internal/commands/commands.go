@@ -6,6 +6,7 @@ type HandlerFunc func(s *discordgo.Session, i *discordgo.InteractionCreate)
 
 var AllCommands = []*discordgo.ApplicationCommand{
 	CID,
+	CreateInstructorChannel,
 	GetRoles,
 	GiveRoles,
 	Ping,
@@ -14,12 +15,13 @@ var AllCommands = []*discordgo.ApplicationCommand{
 }
 
 var CommandHandlers = map[string]HandlerFunc{
-	"cid":       CidHandler,
-	"getroles":  GetRolesHandler,
-	"giveroles": GetRolesHandler,
-	"ping":      PingHandler,
-	"pirep":     PirepHandler,
-	"staff":     StaffHandler,
+	"create-instructor-channel": CreateInstructorChannelHandler,
+	"cid":                       CidHandler,
+	"getroles":                  GetRolesHandler,
+	"giveroles":                 GetRolesHandler,
+	"ping":                      PingHandler,
+	"pirep":                     PirepHandler,
+	"staff":                     StaffHandler,
 }
 
 func int64Ptr(v int64) *int64 {
