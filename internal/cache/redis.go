@@ -235,15 +235,14 @@ func handleUserUpdate(s *discordgo.Session, data string, cfg *models.Config) {
 }
 
 func handleUserAdd(s *discordgo.Session, data string, cfg *models.Config) {
-	var syncRole string
+	syncRole := findSyncRole(cfg)
 
-	for _, role := range cfg.GetManagedRoles() {
-		if role.LookupKey == "sync" {
-			syncRole = role.RoleID
-		}
+	if syncRole == "" {
+		log.Println("No sync role found in configuration")
+
+		return
 	}
 
-	// Link/unlink events.
 	var user UserData
 
 	err := json.Unmarshal([]byte(data), &user)
@@ -324,20 +323,30 @@ func handleUserRemove(s *discordgo.Session, data string, cfg *models.Config) {
 		return
 	}
 
-	for _, role := range cfg.GetManagedRoles() {
-		if role.LookupKey == "sync" {
-			err = helpers.GuildMemberRoleRemove(
-				s,
-				helpers.GetMainDiscordServerID(),
-				user.ID,
-				role.RoleID,
+	syncRole := findSyncRole(cfg)
+
+	if syncRole != "" {
+		err = helpers.GuildMemberRoleRemove(
+			s,
+			helpers.GetMainDiscordServerID(),
+			user.ID,
+			syncRole,
+		)
+		if err != nil {
+			log.Printf(
+				"Error removing 'sync' role from %s: %v\n",
+				strings.ReplaceAll(helpers.GetMemberName(member), "\n", ""), err,
 			)
-			if err != nil {
-				log.Printf(
-					"Error removing 'sync' role from %s: %v\n",
-					strings.ReplaceAll(helpers.GetMemberName(member), "\n", ""), err,
-				)
-			}
 		}
 	}
+}
+
+func findSyncRole(cfg *models.Config) string {
+	for _, role := range cfg.GetManagedRoles() {
+		if role.LookupKey == "sync" {
+			return role.RoleID
+		}
+	}
+
+	return ""
 }
