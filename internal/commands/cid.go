@@ -33,17 +33,12 @@ func CidHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	user, err := zauapi.GetClient().GetUserByID(targetUser.ID)
 	if err != nil {
-		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Unable to retrieve user. Their Discord account may not be linked.",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /cid for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"cid",
+			"Unable to retrieve user. Their Discord account may not be linked.",
+		)
 
 		return
 	}

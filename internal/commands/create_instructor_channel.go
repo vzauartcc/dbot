@@ -45,34 +45,19 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 	// Training Administrator or Senior Staff role only.
 	if !slices.Contains(i.Member.Roles, "1215950778120933467") &&
 		!slices.Contains(i.Member.Roles, "485491894168584202") {
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "You do not have permission to run this command.",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"create-instructor-channel",
+			"You do not have permission to run this command.",
+		)
 
 		return
 	}
 
 	userOption := i.ApplicationCommandData().GetOption("user")
 	if userOption == nil {
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "User is required",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(s, i.Interaction, "create-instructor-channel", "User is required.")
 
 		return
 	}
@@ -81,34 +66,24 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 
 	targetInstructor, err := helpers.GuildMember(s, i.GuildID, targetUser.ID)
 	if err != nil {
-		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Unable to retrieve member.",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"create-instructor-channel",
+			"Unable to retrieve member.",
+		)
 
 		return
 	}
 
 	inputOI := i.ApplicationCommandData().GetOption("operating-initials")
 	if inputOI == nil {
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Operating initials are required",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"create-instructor-channel",
+			"Operating initials are required.",
+		)
 
 		return
 	}
@@ -116,34 +91,19 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 	instructorOI := inputOI.StringValue()
 
 	if instructorOI == "" || len(instructorOI) != 2 {
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Invalid operating initials",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"create-instructor-channel",
+			"Invalid instructor operating initials.",
+		)
 
 		return
 	}
 
 	inputCID := i.ApplicationCommandData().GetOption("cid")
 	if inputCID == nil {
-		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "CID is required",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(s, i.Interaction, "create-instructor-channel", "CID is required.")
 
 		return
 	}
@@ -152,17 +112,7 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 
 	// Founder CIDs start at 800001, not possible to be less than a founder.
 	if instructorCID < 800000 {
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Invalid CID",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(s, i.Interaction, "create-instructor-channel", "Invalid CID.")
 
 		return
 	}
@@ -170,17 +120,12 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 	instructorName := strings.Fields(strings.Split(targetInstructor.Nick, "|")[0])
 
 	if len(instructorName) < 2 {
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Instructor nickname is invalid, fix and try again",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"create-instructor-channel",
+			"Instructor nickname is invalid, please try again.",
+		)
 
 		return
 	}
@@ -197,24 +142,19 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 			err,
 		)
 
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Error creating instructor role",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"create-instructor-channel",
+			"Error creating instructor role",
+		)
 
 		return
 	}
 
 	createdChannel := createChannel(
 		s,
-		i,
+		i.Interaction,
 		targetInstructor,
 		createdRole,
 		instructorCID,
@@ -245,7 +185,7 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 
 func createChannel(
 	s *discordgo.Session,
-	i *discordgo.InteractionCreate,
+	i *discordgo.Interaction,
 	instructor *discordgo.Member,
 	role *discordgo.Role,
 	instructorCID int64,
@@ -317,17 +257,12 @@ func createChannel(
 			log.Printf("Error deleting %s role: %v\n", role.Name, err)
 		}
 
-		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Failed to create channel",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending failure response of /create-instructor-channel for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i,
+			"create-instructor-channel",
+			"Failed to create instructor coordination channel.",
+		)
 
 		return nil
 	}

@@ -36,34 +36,24 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			i.GuildID,
 		)
 
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "This server is not configured for automated role handling.",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending /getroles failure for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"getroles",
+			"This server is not configured for automated role management.",
+		)
 
 		return
 	}
 
 	user, err := zauapi.GetClient().GetUserByID(i.Member.User.ID)
 	if err != nil {
-		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "Error verifying account. Ensure your account is linked at [zauartcc.org](https://zauartcc.org/dash)",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending /getroles failure for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"getroles",
+			"Error verifying your account. Please ensure your account is linked at [zauartcc.org](https://zauartcc.org/dash).",
+		)
 
 		return
 	}
@@ -72,27 +62,16 @@ func GetRolesHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	errs := helpers.ExchangeRoles(s, i.Member, cfg, rolesToGive, "/getroles Command")
 	if len(errs) != 0 {
-		var err error
-
 		log.Printf("Error processing /getroles for %s: %v\n", i.Member.User.ID, errs)
 
 		if slices.Contains(errs, helpers.ErrNoChanges) {
-			_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-				Content: "Roles synced! (No changes)",
-				Flags:   discordgo.MessageFlagsEphemeral,
-			})
+			sendFollowUpMessage(s, i.Interaction, "getroles", "Roles synced! (No changes)")
 		} else {
-			_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-				Content: "Error updating your roles.",
-				Flags:   discordgo.MessageFlagsEphemeral,
-			})
-		}
-
-		if err != nil {
-			log.Printf(
-				"Error sending failure of /getroles for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
+			sendFollowUpMessage(
+				s,
+				i.Interaction,
+				"getroles",
+				"An error occurred updating your roles.",
 			)
 		}
 	} else {
