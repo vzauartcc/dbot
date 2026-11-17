@@ -243,12 +243,16 @@ func ProcessStudentAssignment(
 	if member == nil {
 		log.Println("Student not found")
 
+		sendTAFailureMessage(s, studentID, "Member not found")
+
 		return
 	}
 
 	allRoles, err := s.GuildRoles(cfg.GetGuildID())
 	if err != nil {
 		log.Printf("Error getting guild roles: %v\n", err)
+
+		sendTAFailureMessage(s, GetMemberName(member), "Unable to retrieve roles")
 
 		return
 	}
@@ -266,6 +270,12 @@ func ProcessStudentAssignment(
 						GetMemberName(member),
 						err,
 					)
+
+					sendTAFailureMessage(
+						s,
+						GetMemberName(member),
+						"Failed to asssign In Training role",
+					)
 				}
 			} else {
 				err = GuildMemberRoleRemove(s, cfg.GetGuildID(), studentID, role.ID)
@@ -274,6 +284,12 @@ func ProcessStudentAssignment(
 						"Error removing 'In Training' role from %s: %v\n",
 						GetMemberName(member),
 						err,
+					)
+
+					sendTAFailureMessage(
+						s,
+						GetMemberName(member),
+						"Failed to remove In Training role",
 					)
 				}
 			}
@@ -300,6 +316,12 @@ func ProcessStudentAssignment(
 			if err != nil {
 				log.Printf("Error adding student role to %s: %v\n", GetMemberName(member), err)
 
+				sendTAFailureMessage(
+					s,
+					GetMemberName(member),
+					"Failed to asssign instructor's Student role",
+				)
+
 				continue
 			}
 
@@ -313,12 +335,16 @@ func ProcessStudentAssignment(
 		if !slices.Contains(member.Roles, role.ID) {
 			log.Printf("No student role to remove for %s\n", GetMemberName(member))
 
+			sendTAFailureMessage(s, GetMemberName(member), "No instructor's Student role to remove")
+
 			continue
 		}
 
 		err = GuildMemberRoleRemove(s, cfg.GetGuildID(), studentID, role.ID)
 		if err != nil {
 			log.Printf("Error removing %s from %s: %v\n", role.Name, GetMemberName(member), err)
+
+			sendTAFailureMessage(s, GetMemberName(member), "Failed to remove role "+role.Name)
 		}
 
 		continue
@@ -361,5 +387,20 @@ func ProcessStudentAssignment(
 		if err != nil {
 			log.Printf("Error sending welcome message for %s: %v\n", GetMemberName(member), err)
 		}
+	}
+}
+
+func sendTAFailureMessage(s *discordgo.Session, name, reason string) {
+	_, err := ChannelMessageSend(
+		s,
+		"",
+		fmt.Sprintf(
+			"<@&1215950778120933467> Automatic training role sync failure for %s: %s",
+			name,
+			reason,
+		),
+	)
+	if err != nil {
+		log.Printf("Error sending TA failure message: %v\n", err)
 	}
 }
