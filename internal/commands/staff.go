@@ -25,16 +25,12 @@ func StaffHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		log.Printf("Error getting staff members: %v\n", err)
 
-		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "An error has occurred.",
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending success response for /staff for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"staff",
+			"An error occurred getting the facility staff members.",
+		)
 
 		return
 	}

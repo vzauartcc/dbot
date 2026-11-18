@@ -19,6 +19,12 @@ func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
+	if message.ChannelID == "544667260980297737" || message.ChannelID == "756596099103457301" {
+		handleAtcsccChannels(s, message)
+
+		return
+	}
+
 	if message.Author.ID == s.State.User.ID || message.Author.Bot {
 		return
 	}
@@ -33,10 +39,6 @@ func HandleMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
 		handleReminderChannel(s, message, cfg.GetReminderChannels()[message.ChannelID])
 
 		return
-	}
-
-	if message.ChannelID == "544667260980297737" || message.ChannelID == "756596099103457301" {
-		handleAtcsccChannels(s, message)
 	}
 }
 

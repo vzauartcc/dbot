@@ -126,17 +126,12 @@ func PirepHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	// debug: change to real channel later
 	if i.ChannelID != "1423816312299196426" {
-		_, err := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: "This command may not be used in this channel.",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending invalid channel response for /pirep for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(
+			s,
+			i.Interaction,
+			"pirep",
+			"This command may not be used in this channel.",
+		)
 
 		return
 	}
@@ -148,17 +143,7 @@ func PirepHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	report, err := buildPirep(opts)
 	if err != nil {
-		_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-			Content: err.Error(),
-			Flags:   discordgo.MessageFlagsEphemeral,
-		})
-		if err != nil {
-			log.Printf(
-				"Error sending validation response for /pirep for %s: %v\n",
-				helpers.GetMemberName(i.Member),
-				err,
-			)
-		}
+		sendFollowUpMessage(s, i.Interaction, "pirep", err.Error())
 
 		return
 	}
