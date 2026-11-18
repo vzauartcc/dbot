@@ -170,6 +170,18 @@ func GuildChannelCreateComplex(
 	return s.GuildChannelCreateComplex(guildID, createData, options...)
 }
 
+func ChannelEdit(
+	s *discordgo.Session,
+	channelID string,
+	editData *discordgo.ChannelEdit,
+) (*discordgo.Channel, error) {
+	if GetIsDevEnvironment() {
+		return nil, ErrDevEnvironment
+	}
+
+	return s.ChannelEdit(channelID, editData)
+}
+
 // Interactions
 
 func InteractionRespond(
