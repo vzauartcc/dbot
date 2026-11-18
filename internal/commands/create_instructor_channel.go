@@ -134,6 +134,7 @@ func CreateInstructorChannelHandler(s *discordgo.Session, i *discordgo.Interacti
 		Name:        fmt.Sprintf("%s Student (%d)", instructorOI, instructorCID),
 		Hoist:       new(false),
 		Mentionable: new(true),
+		Permissions: int64Ptr(0),
 	})
 	if err != nil {
 		log.Printf(
@@ -269,6 +270,7 @@ func createChannel(
 
 	// Ensure channel is sorted correctly, since discord sometimes ignores
 	// the Position field in the GuildChannelCreateComplex call.
+	// ths is spelled wrong
 	_, err = helpers.ChannelEdit(s, createdChannel.ID, &discordgo.ChannelEdit{
 		Position: new(13),
 	})
