@@ -206,7 +206,7 @@ func createChannel(
 				instructorCID,
 				instructor.User.ID,
 			),
-			// Gets past most of the announcment and other channels.
+			// Gets past most of the announcement and other channels.
 			Position: 13,
 			PermissionOverwrites: []*discordgo.PermissionOverwrite{
 				// Deny @everyone, which uses the guild ID for the role ID.
@@ -265,6 +265,19 @@ func createChannel(
 		)
 
 		return nil
+	}
+
+	// Ensure channel is sorted correctly, since discord sometimes ignores
+	// the Position field in the GuildChannelCreateComplex call.
+	_, err = helpers.ChannelEdit(s, createdChannel.ID, &discordgo.ChannelEdit{
+		Position: new(13),
+	})
+	if err != nil {
+		log.Printf(
+			"Error sorting newly created instructor text channel %s: %v\n",
+			instructor.Nick,
+			err,
+		)
 	}
 
 	return createdChannel
