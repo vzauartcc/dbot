@@ -11,7 +11,11 @@ var ErrDevEnvironment = errors.New("discord api call skip due to dev environment
 
 // ApplicationCommands
 
-func ApplicationCommands(s *discordgo.Session, guildID string, options ...discordgo.RequestOption) ([]*discordgo.ApplicationCommand, error) {
+func ApplicationCommands(
+	s *discordgo.Session,
+	guildID string,
+	options ...discordgo.RequestOption,
+) ([]*discordgo.ApplicationCommand, error) {
 	if GetIsDevEnvironment() {
 		return nil, ErrDevEnvironment
 	}
@@ -19,7 +23,12 @@ func ApplicationCommands(s *discordgo.Session, guildID string, options ...discor
 	return s.ApplicationCommands(s.State.User.ID, guildID, options...)
 }
 
-func ApplicationCommandCreate(s *discordgo.Session, guildID string, cmd *discordgo.ApplicationCommand, options ...discordgo.RequestOption) (*discordgo.ApplicationCommand, error) {
+func ApplicationCommandCreate(
+	s *discordgo.Session,
+	guildID string,
+	cmd *discordgo.ApplicationCommand,
+	options ...discordgo.RequestOption,
+) (*discordgo.ApplicationCommand, error) {
 	if GetIsDevEnvironment() {
 		return nil, ErrDevEnvironment
 	}
@@ -27,7 +36,11 @@ func ApplicationCommandCreate(s *discordgo.Session, guildID string, cmd *discord
 	return s.ApplicationCommandCreate(s.State.User.ID, guildID, cmd, options...)
 }
 
-func ApplicationCommandDelete(s *discordgo.Session, guildID, cmdID string, options ...discordgo.RequestOption) error {
+func ApplicationCommandDelete(
+	s *discordgo.Session,
+	guildID, cmdID string,
+	options ...discordgo.RequestOption,
+) error {
 	if GetIsDevEnvironment() {
 		return ErrDevEnvironment
 	}
@@ -37,17 +50,32 @@ func ApplicationCommandDelete(s *discordgo.Session, guildID, cmdID string, optio
 
 // Guild Member
 
-func GuildMember(s *discordgo.Session, guildID, userID string, options ...discordgo.RequestOption) (*discordgo.Member, error) {
+func GuildMember(
+	s *discordgo.Session,
+	guildID, userID string,
+	options ...discordgo.RequestOption,
+) (*discordgo.Member, error) {
 	// Read-only endpoint; environment check not needed for this API call.
 	return s.GuildMember(guildID, userID, options...)
 }
 
-func RequestGuildMembers(s *discordgo.Session, guildID, query string, limit int, nonce string, presences bool) error {
+func RequestGuildMembers(
+	s *discordgo.Session,
+	guildID, query string,
+	limit int,
+	nonce string,
+	presences bool,
+) error {
 	// Read-only endpoint; environment check not needed for this API call.
 	return s.RequestGuildMembers(guildID, query, limit, nonce, presences)
 }
 
-func GuildMemberAdd(s *discordgo.Session, guildID, userID string, data *discordgo.GuildMemberAddParams, options ...discordgo.RequestOption) error {
+func GuildMemberAdd(
+	s *discordgo.Session,
+	guildID, userID string,
+	data *discordgo.GuildMemberAddParams,
+	options ...discordgo.RequestOption,
+) error {
 	if GetIsDevEnvironment() {
 		return ErrDevEnvironment
 	}
@@ -55,7 +83,11 @@ func GuildMemberAdd(s *discordgo.Session, guildID, userID string, data *discordg
 	return s.GuildMemberAdd(guildID, userID, data, options...)
 }
 
-func GuildMemberNickname(s *discordgo.Session, guildID, userID, nickname string, options ...discordgo.RequestOption) error {
+func GuildMemberNickname(
+	s *discordgo.Session,
+	guildID, userID, nickname string,
+	options ...discordgo.RequestOption,
+) error {
 	if GetIsDevEnvironment() {
 		return ErrDevEnvironment
 	}
@@ -63,7 +95,11 @@ func GuildMemberNickname(s *discordgo.Session, guildID, userID, nickname string,
 	return s.GuildMemberNickname(guildID, userID, nickname, options...)
 }
 
-func GuildMemberRoleAdd(s *discordgo.Session, guildID, userID, roleID string, options ...discordgo.RequestOption) error {
+func GuildMemberRoleAdd(
+	s *discordgo.Session,
+	guildID, userID, roleID string,
+	options ...discordgo.RequestOption,
+) error {
 	if GetIsDevEnvironment() {
 		return ErrDevEnvironment
 	}
@@ -71,7 +107,11 @@ func GuildMemberRoleAdd(s *discordgo.Session, guildID, userID, roleID string, op
 	return s.GuildMemberRoleAdd(guildID, userID, roleID, options...)
 }
 
-func GuildMemberRoleRemove(s *discordgo.Session, guildID, userID, roleID string, options ...discordgo.RequestOption) error {
+func GuildMemberRoleRemove(
+	s *discordgo.Session,
+	guildID, userID, roleID string,
+	options ...discordgo.RequestOption,
+) error {
 	if GetIsDevEnvironment() {
 		return ErrDevEnvironment
 	}
@@ -81,14 +121,63 @@ func GuildMemberRoleRemove(s *discordgo.Session, guildID, userID, roleID string,
 
 // Guild Roles
 
-func GuildRoles(s *discordgo.Session, guildID string, options ...discordgo.RequestOption) ([]*discordgo.Role, error) {
+func GuildRoles(
+	s *discordgo.Session,
+	guildID string,
+	options ...discordgo.RequestOption,
+) ([]*discordgo.Role, error) {
 	// Read-only endpoint; environment check not needed for this API call.
 	return s.GuildRoles(guildID, options...)
 }
 
+func GuildRoleCreate(
+	s *discordgo.Session,
+	guildID string,
+	roleParams *discordgo.RoleParams,
+	options ...discordgo.RequestOption,
+) (*discordgo.Role, error) {
+	if GetIsDevEnvironment() {
+		return nil, ErrDevEnvironment
+	}
+
+	return s.GuildRoleCreate(guildID, roleParams, options...)
+}
+
+func GuildRoleDelete(
+	s *discordgo.Session,
+	guildID, roleID string,
+	options ...discordgo.RequestOption,
+) error {
+	if GetIsDevEnvironment() {
+		return ErrDevEnvironment
+	}
+
+	return s.GuildRoleDelete(guildID, roleID, options...)
+}
+
+// Guild Channels
+
+func GuildChannelCreateComplex(
+	s *discordgo.Session,
+	guildID string,
+	createData discordgo.GuildChannelCreateData,
+	options ...discordgo.RequestOption,
+) (*discordgo.Channel, error) {
+	if GetIsDevEnvironment() {
+		return nil, ErrDevEnvironment
+	}
+
+	return s.GuildChannelCreateComplex(guildID, createData, options...)
+}
+
 // Interactions
 
-func InteractionRespond(s *discordgo.Session, interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error {
+func InteractionRespond(
+	s *discordgo.Session,
+	interaction *discordgo.Interaction,
+	resp *discordgo.InteractionResponse,
+	options ...discordgo.RequestOption,
+) error {
 	if GetIsDevEnvironment() {
 		return ErrDevEnvironment
 	}
@@ -96,7 +185,13 @@ func InteractionRespond(s *discordgo.Session, interaction *discordgo.Interaction
 	return s.InteractionRespond(interaction, resp, options...)
 }
 
-func FollowupMessageCreate(s *discordgo.Session, interaction *discordgo.Interaction, wait bool, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+func FollowupMessageCreate(
+	s *discordgo.Session,
+	interaction *discordgo.Interaction,
+	wait bool,
+	data *discordgo.WebhookParams,
+	options ...discordgo.RequestOption,
+) (*discordgo.Message, error) {
 	if GetIsDevEnvironment() {
 		return nil, ErrDevEnvironment
 	}
@@ -106,25 +201,43 @@ func FollowupMessageCreate(s *discordgo.Session, interaction *discordgo.Interact
 
 // Messages
 
-func ChannelMessage(s *discordgo.Session, channelID, messageID string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+func ChannelMessage(
+	s *discordgo.Session,
+	channelID, messageID string,
+	options ...discordgo.RequestOption,
+) (*discordgo.Message, error) {
 	// Read-only endpoint; environment check not needed for this API call.
 	return s.ChannelMessage(channelID, messageID, options...)
 }
 
-func ChannelMessages(s *discordgo.Session, channelID string, limit int, beforeID, afterID, aroundID string, options ...discordgo.RequestOption) ([]*discordgo.Message, error) {
+func ChannelMessages(
+	s *discordgo.Session,
+	channelID string,
+	limit int,
+	beforeID, afterID, aroundID string,
+	options ...discordgo.RequestOption,
+) ([]*discordgo.Message, error) {
 	// Read-only endpoint; environment check not needed for this API call.
 	return s.ChannelMessages(channelID, limit, beforeID, afterID, aroundID, options...)
 }
 
-func ChannelMessageEditComplex(s *discordgo.Session, m *discordgo.MessageEdit, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+func ChannelMessageEditComplex(
+	s *discordgo.Session,
+	msg *discordgo.MessageEdit,
+	options ...discordgo.RequestOption,
+) (*discordgo.Message, error) {
 	if GetIsDevEnvironment() {
 		return nil, ErrDevEnvironment
 	}
 
-	return s.ChannelMessageEditComplex(m, options...)
+	return s.ChannelMessageEditComplex(msg, options...)
 }
 
-func ChannelMessageSend(s *discordgo.Session, channelID, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+func ChannelMessageSend(
+	s *discordgo.Session,
+	channelID, content string,
+	options ...discordgo.RequestOption,
+) (*discordgo.Message, error) {
 	if GetIsDevEnvironment() {
 		return nil, ErrDevEnvironment
 	}
@@ -132,7 +245,12 @@ func ChannelMessageSend(s *discordgo.Session, channelID, content string, options
 	return s.ChannelMessageSend(channelID, content, options...)
 }
 
-func ChannelMessageSendComplex(s *discordgo.Session, channelID string, data *discordgo.MessageSend, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+func ChannelMessageSendComplex(
+	s *discordgo.Session,
+	channelID string,
+	data *discordgo.MessageSend,
+	options ...discordgo.RequestOption,
+) (*discordgo.Message, error) {
 	if GetIsDevEnvironment() {
 		return nil, ErrDevEnvironment
 	}
@@ -140,7 +258,12 @@ func ChannelMessageSendComplex(s *discordgo.Session, channelID string, data *dis
 	return s.ChannelMessageSendComplex(channelID, data, options...)
 }
 
-func ChannelMessageSendEmbed(s *discordgo.Session, channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+func ChannelMessageSendEmbed(
+	s *discordgo.Session,
+	channelID string,
+	embed *discordgo.MessageEmbed,
+	options ...discordgo.RequestOption,
+) (*discordgo.Message, error) {
 	if GetIsDevEnvironment() {
 		return nil, ErrDevEnvironment
 	}
@@ -148,7 +271,11 @@ func ChannelMessageSendEmbed(s *discordgo.Session, channelID string, embed *disc
 	return s.ChannelMessageSendEmbed(channelID, embed, options...)
 }
 
-func ChannelMessageDelete(s *discordgo.Session, channelID, messageID string, options ...discordgo.RequestOption) error {
+func ChannelMessageDelete(
+	s *discordgo.Session,
+	channelID, messageID string,
+	options ...discordgo.RequestOption,
+) error {
 	if GetIsDevEnvironment() {
 		return ErrDevEnvironment
 	}
