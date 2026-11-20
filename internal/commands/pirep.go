@@ -131,6 +131,10 @@ func PirepHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			"pirep",
 			"This command may not be used in this channel.",
 		)
+		_, _ = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
+			Content: "Command processed.",
+			Flags:   discordgo.MessageFlagsEphemeral,
+		})
 
 		return
 	}
@@ -143,29 +147,44 @@ func PirepHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	report, err := buildPirep(opts)
 	if err != nil {
 		sendFollowUpMessage(s, i.Interaction, "pirep", err.Error())
+		_, _ = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
+			Content: "Command processed.",
+			Flags:   discordgo.MessageFlagsEphemeral,
+		})
 
 		return
 	}
 
-	_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-		Content: new(""),
-	})
+	_, err = helpers.ChannelMessageSend(s, i.ChannelID, report)
 	if err != nil {
 		log.Printf(
-			"Error sending completion response for /pirep for %s: %v\n",
+			"Error sending response for /pirep for %s: %v\n",
 			helpers.GetMemberName(i.Member),
 			err,
 		)
+
+		_, err2 := helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
+			Content: "Command processed.",
+			Flags:   discordgo.MessageFlagsEphemeral,
+		})
+		if err2 != nil {
+			log.Printf(
+				"Error sending failure for /pirep for %s: %v\n",
+				helpers.GetMemberName(i.Member),
+				err2,
+			)
+		}
 
 		return
 	}
 
 	_, err = helpers.FollowupMessageCreate(s, i.Interaction, true, &discordgo.WebhookParams{
-		Content: report,
+		Content: "PIREP posted successfully.",
+		Flags:   discordgo.MessageFlagsEphemeral,
 	})
 	if err != nil {
 		log.Printf(
-			"Error sending response for /pirep for %s: %v\n",
+			"Error sending confirmation for /pirep for %s: %v\n",
 			helpers.GetMemberName(i.Member),
 			err,
 		)
