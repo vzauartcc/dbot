@@ -90,6 +90,11 @@ func main() {
 		s.LogLevel = discordgo.LogWarning
 	}
 
+	err = cache.ConnectRedis(ctx)
+	if err != nil {
+		log.Printf("Error connecting to Redis: %v\n", err)
+	}
+
 	err = s.Open()
 	if err != nil {
 		log.Printf("Error opening bot connection: %s\n", err)
@@ -99,11 +104,6 @@ func main() {
 	defer s.Close()
 
 	bot.RegisterCommands(s)
-
-	err = cache.ConnectRedis(ctx)
-	if err != nil {
-		log.Printf("Error connecting to Redis: %v\n", err)
-	}
 
 	runner := tasks.SetupTasks(s)
 
