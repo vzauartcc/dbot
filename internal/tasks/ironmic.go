@@ -9,10 +9,17 @@ import (
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	"github.com/vzauartcc/dbot/internal/cache"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func (m *Manager) UpdateIronMic() {
+	if !cache.IsSessionReady() {
+		log.Println("[IronMic] Skipping UpdateIronMic: session not ready")
+
+		return
+	}
+
 	log.Println("Running Iron Mic task...")
 
 	data, err := zauapi.GetClient().GetIronMic()

@@ -9,10 +9,17 @@ import (
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	"github.com/vzauartcc/dbot/internal/cache"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func (m *Manager) AutoGiveRoles() {
+	if !cache.IsSessionReady() {
+		log.Println("[AutoRoles] Skipping AutoGiveRoles: session not ready")
+
+		return
+	}
+
 	cfg, ok := models.GetConfig(helpers.GetMainDiscordServerID())
 	if !ok {
 		log.Println("[AutoRoles] Skipping AutoGiveRoles due to no config")

@@ -6,6 +6,8 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"sync/atomic"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/redis/go-redis/v9"
@@ -23,6 +25,7 @@ type UserData struct {
 var (
 	instance        *Instance
 	ErrNotConnected = errors.New("redis not connected")
+	sessionReady    atomic.Bool
 )
 
 type Instance struct {
@@ -60,6 +63,14 @@ func DisconnectRedis() {
 	}
 
 	instance.client.Close()
+}
+
+func SetSessionReady(ready bool) {
+	sessionReady.Store(ready)
+}
+
+func IsSessionReady() bool {
+	return sessionReady.Load()
 }
 
 func GetReminderMessage(channelID string) (string, error) {
@@ -110,6 +121,13 @@ func StartRedisQueue(s *discordgo.Session) {
 			log.Println("Redis queue aborted due to no Redis connection")
 
 			return
+		}
+
+		if !sessionReady.Load() {
+			log.Println("Session not ready, waiting...")
+			time.Sleep(5 * time.Second)
+
+			continue
 		}
 
 		result, err := instance.client.BRPop(instance.ctx, 0, "dbot:new_discord_user", "dbot:remove_discord_user", "dbot:update_user", "dbot:config_update", "dbot:student_assignment").

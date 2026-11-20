@@ -6,10 +6,17 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	"github.com/vzauartcc/dbot/internal/cache"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func (m *Manager) CleanupChannels() {
+	if !cache.IsSessionReady() {
+		log.Println("[ChannelCleanup] Skipping CleanupChannels: session not ready")
+
+		return
+	}
+
 	log.Println("Starting channel cleanup task")
 
 	for _, cfg := range models.GetConfigs() {

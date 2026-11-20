@@ -38,13 +38,17 @@ func main() {
 	bot.RegisterHandlers(s)
 
 	// Special registration for the Ready event to handle retry logic.
-	s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Ready) {
+	s.AddHandler(func(s *discordgo.Session, _ *discordgo.Ready) {
 		retryMutex.Lock()
 		defer retryMutex.Unlock()
 
 		retryCount = 0
 
 		log.Println("==========>  Bot is ready!")
+
+		cache.SetSessionReady(true)
+
+		go cache.StartRedisQueue(s)
 	})
 
 	// Special registration for the Resumed event to handle retry logic.
@@ -55,11 +59,15 @@ func main() {
 		retryCount = 0
 
 		log.Println("==========>  Bot reconnected!")
+
+		cache.SetSessionReady(true)
 	})
 
 	// Special registration for the Disconnect event to handle retry logic..
 	disconnectHandler := s.AddHandler(func(_ *discordgo.Session, _ *discordgo.Disconnect) {
 		log.Println("==========>  Discord connection lost, waiting for reconnect...")
+
+		cache.SetSessionReady(false)
 
 		retryMutex.Lock()
 		defer retryMutex.Unlock()
@@ -95,8 +103,6 @@ func main() {
 	err = cache.ConnectRedis(ctx)
 	if err != nil {
 		log.Printf("Error connecting to Redis: %v\n", err)
-	} else {
-		go cache.StartRedisQueue(s)
 	}
 
 	runner := tasks.SetupTasks(s)
