@@ -124,7 +124,7 @@ func StartRedisQueue(s *discordgo.Session) {
 		}
 
 		if !sessionReady.Load() {
-			log.Println("Session not ready, waiting...")
+			log.Println("Session not ready, waiting for reconnect...")
 			time.Sleep(5 * time.Second)
 
 			continue
