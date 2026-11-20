@@ -377,7 +377,7 @@ func ProcessStudentAssignment(
 				"<@%s> Welcome to <#%s>! Feel free to post your availability and coordinate training sessions with <@%s> in this channel."+
 					"\n\nAs a reminder, you must complete two (2) training sessions per calendar month to remain in the training program. "+
 					"The training requirement does not apply to you for this current month."+
-					"\n\n**Please post your availability within the next 48 hours.** "+
+					"\n\n**Please post your availability within the next 48 hours, covering the next 1-2 weeks.** "+
 					"Otherwise your training spot may be given to the next person in line.",
 				studentID,
 				channel.ID,
