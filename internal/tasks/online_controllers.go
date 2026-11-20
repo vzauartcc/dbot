@@ -9,10 +9,17 @@ import (
 	"github.com/bwmarrin/discordgo"
 	zauapi "github.com/vzauartcc/dbot/internal/api"
 	"github.com/vzauartcc/dbot/internal/api/models"
+	"github.com/vzauartcc/dbot/internal/cache"
 	helpers "github.com/vzauartcc/dbot/internal/utilities"
 )
 
 func (m *Manager) UpdateOnlineControllers() {
+	if !cache.IsSessionReady() {
+		log.Println("[OnlineControllers] Skipping UpdateOnlineControllers: session not ready")
+
+		return
+	}
+
 	online, err := zauapi.GetClient().GetOnlineATC()
 	if err != nil {
 		log.Printf("Error getting online data: %v\n", err)
