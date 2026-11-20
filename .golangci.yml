@@ -13,6 +13,7 @@ linters:
     - gocognit # check once in a while
     - goconst
     - gomodguard # deprecated in v2.12.0
+    - gomoddirectives
     - ireturn
     - lll
     - mnd
