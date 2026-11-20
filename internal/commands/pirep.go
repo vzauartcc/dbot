@@ -83,38 +83,38 @@ var Pirep = &discordgo.ApplicationCommand{
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "sk",
-			Description: "Sky conditions (e.g. SCT030 BKN 070)",
+			Description: "Sky conditions (e.g. SCT030 BKN 070) (optional)",
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "wx",
-			Description: "Weather and visibility (e.g. 10SM RA), intensity is not reported",
+			Description: "Weather and visibility (e.g. 10SM RA), intensity is not reported (optional)",
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "ta",
-			Description: "Air temperature in Celsius (e.g. -03, 13)",
+			Description: "Air temperature in Celsius (e.g. -03, 13) (optional)",
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "wv",
-			Description: "Wind direction and speed (e.g. 270011)",
+			Description: "Wind direction and speed (e.g. 270011) (optional)",
 			MaxLength:   6,
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "tb",
-			Description: "Turbulence type, frequency and intensity, using standard contractions",
+			Description: "Turbulence type, frequency and intensity, using standard contractions (optional)",
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "ic",
-			Description: "Icing type and intensity, using standard intensity and contractions",
+			Description: "Icing type and intensity, using standard intensity and contractions (optional)",
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "rm",
-			Description: "Additional remarks",
+			Description: "Additional remarks (optional)",
 		},
 	},
 }
@@ -124,8 +124,7 @@ func PirepHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	// debug: change to real channel later
-	if i.ChannelID != "1423816312299196426" {
+	if i.ChannelID != "756591476569276544" {
 		sendFollowUpMessage(
 			s,
 			i.Interaction,
@@ -144,6 +143,19 @@ func PirepHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	report, err := buildPirep(opts)
 	if err != nil {
 		sendFollowUpMessage(s, i.Interaction, "pirep", err.Error())
+
+		return
+	}
+
+	_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+		Content: new(""),
+	})
+	if err != nil {
+		log.Printf(
+			"Error sending completion response for /pirep for %s: %v\n",
+			helpers.GetMemberName(i.Member),
+			err,
+		)
 
 		return
 	}
