@@ -166,7 +166,7 @@ var atcsccFacilities = map[string]struct{}{
 	"MSN": {},
 	"PIA": {},
 	"SBN": {},
-	"ARR": {},
+	// "ARR": {}, // Disabled because it matches "Arrival" abbreviation
 	"AZO": {},
 	"BMI": {},
 	"BTL": {},
@@ -188,6 +188,40 @@ var atcsccFacilities = map[string]struct{}{
 	"UES": {},
 	"UGN": {},
 	"VOK": {},
+
+	"KORD": {},
+	"KMDW": {},
+	"KCID": {},
+	"KCMI": {},
+	"KFWA": {},
+	"KGRR": {},
+	"KMKE": {},
+	"KMLI": {},
+	"KMSN": {},
+	"KPIA": {},
+	"KSBN": {},
+	"KARR": {},
+	"KAZO": {},
+	"KBMI": {},
+	"KBTL": {},
+	"KDBQ": {},
+	"KDEC": {},
+	"KDPA": {},
+	"KEKM": {},
+	"KENW": {},
+	"KGUS": {},
+	"KGYY": {},
+	"KJVL": {},
+	"KLAF": {},
+	"KLOT": {},
+	"KMKG": {},
+	"KMWC": {},
+	"KOSH": {},
+	"KPWK": {},
+	"KRFD": {},
+	"KUES": {},
+	"KUGN": {},
+	"KVOK": {},
 }
 
 func handleAtcsccChannels(s *discordgo.Session, message *discordgo.MessageCreate) {
@@ -199,6 +233,8 @@ func handleAtcsccChannels(s *discordgo.Session, message *discordgo.MessageCreate
 
 	for _, word := range parts {
 		if _, ok := atcsccFacilities[word]; ok {
+			log.Println("matched token", word)
+
 			// For testing, use my test channel
 			_, err := helpers.ChannelMessageSend(s, "1423816312299196426", message.Content)
 			if err != nil {
